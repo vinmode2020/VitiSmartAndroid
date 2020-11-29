@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/darkgreen1"
+    tools:context=".Login">
+
+
+    <TextView
+        android:id="@+id/textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/aclonica"
+        android:text="VinMod"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#D2E41B"
+        android:textColorHighlight="#FFFEFE"
+        android:textSize="55sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.07999998" />
+
+    <EditText
+        android:id="@+id/editTextTextPersonName"
+        android:layout_width="343dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="62dp"
+        android:background="#EDF3F2"
+        android:ems="10"
+        android:hint="  Email"
+        android:inputType="textPersonName"
+        android:rotationY="2"
+        android:singleLine="false"
+        android:textColor="#4CAF50"
+        android:textColorHint="#A7B7C2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.558"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview" />
+
+    <Button
+        android:id="@+id/loginBtn"
+        android:layout_width="108dp"
+        android:layout_height="57dp"
+        android:layout_marginTop="16dp"
+        android:text="Login"
+        app:backgroundTint="#098F0E"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName2" />
+
+    <EditText
+        android:id="@+id/editTextTextPersonName2"
+        android:layout_width="343dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="16dp"
+        android:background="#EDF3F2"
+        android:ems="10"
+        android:hint="  Password"
+        android:inputType="textPersonName"
+        android:rotationY="2"
+        android:singleLine="false"
+        android:textColor="#4CAF50"
+        android:textColorHint="#A7B7C2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.558"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName" />
+
+    <EditText
+        android:id="@+id/forgotPassword"
+        android:layout_width="185dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="24dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Forgot the Password?"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginBtn" />
+
+    <EditText
+        android:id="@+id/returnToRegister"
+        android:layout_width="185dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Create a new account"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/forgotPassword" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

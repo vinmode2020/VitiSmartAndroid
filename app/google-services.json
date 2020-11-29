@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "694250784649",
+    "firebase_url": "https://vinmode-144a9.firebaseio.com",
+    "project_id": "vinmode-144a9",
+    "storage_bucket": "vinmode-144a9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:694250784649:android:7a1eebeb3195e57c774358",
+        "android_client_info": {
+          "package_name": "com.example.vinmod"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "694250784649-mkp75cm8lf0uuncg2jbif20s7svfjmo0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAAH8AM-yjUcI0hByp11d5uS41EiGGYfU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "694250784649-mkp75cm8lf0uuncg2jbif20s7svfjmo0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
