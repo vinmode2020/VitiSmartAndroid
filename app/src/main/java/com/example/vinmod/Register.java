@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class Register extends AppCompatActivity {
     public static final String TAG = "TAG";
-    EditText mFullName,mEmail,mPassword,mPhone;
+    EditText mFullName,mEmail,mPassword,mPhone, ConfPassword;
     Button mRegisterBtn, mLoginBtn;
     FirebaseAuth fAuth;
     ProgressBar progressBar;
@@ -43,6 +43,7 @@ public class Register extends AppCompatActivity {
         mFullName   = findViewById(R.id.fullName);
         mEmail      = findViewById(R.id.Email);
         mPassword   = findViewById(R.id.password);
+        ConfPassword = findViewById(R.id.ConfPassword);
         mPhone      = findViewById(R.id.phone);
         mRegisterBtn= findViewById(R.id.registerBtn);
         mLoginBtn   = findViewById(R.id.createText);
@@ -62,8 +63,14 @@ public class Register extends AppCompatActivity {
             public void onClick(View v) {
                 final String email = mEmail.getText().toString().trim();
                 String password = mPassword.getText().toString().trim();
+                String con_password = ConfPassword.getText().toString().trim();
                 final String fullName = mFullName.getText().toString();
                 final String phone    = mPhone.getText().toString();
+
+                if(TextUtils.isEmpty(email)){
+                    mFullName.setError("Name is required");
+                    return;
+                }
 
                 if(TextUtils.isEmpty(email)){
                     mEmail.setError("Email is Required.");
@@ -80,17 +87,20 @@ public class Register extends AppCompatActivity {
                     return;
                 }
 
+                if(con_password != password ){
+                    mPassword.setError("Passwords do not match");
+                    return;
+                }
+
                 progressBar.setVisibility(View.VISIBLE);
 
                 // register the user in firebase
-
                 fAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
 
                             // send verification link
-
                             FirebaseUser fuser = fAuth.getCurrentUser();
                             fuser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
