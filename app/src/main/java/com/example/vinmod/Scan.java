@@ -40,12 +40,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
-import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 
 public class Scan extends AppCompatActivity {
     public static final int CAMERA_PERM_CODE = 101;
     public static final int CAMERA_REQUEST_CODE = 102;
     public static final int GALLERY_REQUEST_CODE = 105;
+    public static final int STORAGE_PER_CODE = 103;
+
+
+
     ImageView selectedImage;
     Button cameraBtn,galleryBtn;
     String currentPhotoPath;
@@ -102,6 +105,7 @@ public class Scan extends AppCompatActivity {
         notSureBtn = findViewById(R.id.notSureBtn);
 
         askCameraPermissions();
+        askStoragePermissions();
 
         mCamera = getCameraInstance();
 
@@ -167,6 +171,24 @@ public class Scan extends AppCompatActivity {
 //        }
 
     }
+
+
+
+
+
+        // Ask for storage permission
+    /** This is not working as of now */
+    private void askStoragePermissions() {
+        if(ContextCompat.checkSelfPermission(this,Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+           ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.MANAGE_EXTERNAL_STORAGE}, STORAGE_PER_CODE );}
+//        }else {
+//            dispatchTakePictureIntent();
+//     Toast.makeText(Scan.this, "TEST ELSE Camera permission.", Toast.LENGTH_SHORT).show();
+//        }
+
+    }
+
+
 
     // If the user granted the permission open the camera,
     @Override
