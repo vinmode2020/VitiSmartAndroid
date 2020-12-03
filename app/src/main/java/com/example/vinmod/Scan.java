@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,7 +14,9 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,9 +33,14 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
+import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 
 public class Scan extends AppCompatActivity {
     public static final int CAMERA_PERM_CODE = 101;
@@ -44,6 +52,38 @@ public class Scan extends AppCompatActivity {
     StorageReference storageReference;
     Button infBtn ,notSureBtn;
     Button notInfBtn;
+    Camera mCamera;
+    CameraPreview mPreview;
+    TextView stepCounter;
+    TextView stepDescription;
+    File pictureFile;
+    Uri contentUri;
+
+    private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+
+            pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+            if (pictureFile == null){
+                Log.d("PICTURE", "Error creating media file, check storage permissions");
+                return;
+            }
+
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                fos.write(data);
+                fos.close();
+            } catch (FileNotFoundException e) {
+                Log.d("PICTURE", "File not found: " + e.getMessage());
+            } catch (IOException e) {
+                Log.d("PICTURE", "Error accessing file: " + e.getMessage());
+            }
+
+            selectedImage.setImageURI(Uri.fromFile(pictureFile));
+            selectedImage.setRotation(90);
+        }
+    };
 
 
     @Override
@@ -51,20 +91,37 @@ public class Scan extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
+        stepCounter = findViewById(R.id.stepCounter);
+        stepDescription = findViewById(R.id.stepDesc);
         selectedImage = findViewById(R.id.displayImageView);
         cameraBtn = findViewById(R.id.cameraBtn);
         galleryBtn = findViewById(R.id.galleryBtn);
         storageReference = FirebaseStorage.getInstance().getReference();
         infBtn = findViewById(R.id.infBtn);
         notInfBtn = findViewById(R.id.notInfBtn);
-        notSureBtn = findViewById(R.id.notInfBtn);
+        notSureBtn = findViewById(R.id.notSureBtn);
 
+        askCameraPermissions();
 
+        mCamera = getCameraInstance();
+
+        mPreview = new CameraPreview(this, mCamera);
+        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        preview.addView(mPreview);
 
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                askCameraPermissions();
+                cameraBtn.setVisibility(View.INVISIBLE);
+                galleryBtn.setVisibility(View.INVISIBLE);
+                preview.setVisibility(View.INVISIBLE);
+                infBtn.setVisibility(View.VISIBLE);
+                notInfBtn.setVisibility(View.VISIBLE);
+                notSureBtn.setVisibility(View.VISIBLE);
+                selectedImage.setVisibility(View.VISIBLE);
+                stepCounter.setText("Step 2");
+                stepDescription.setText("Review the image and confirm its status.");
+                mCamera.takePicture(null, null, mPicture);
             }
         });
 
@@ -81,15 +138,33 @@ public class Scan extends AppCompatActivity {
             }
         });
 
+        infBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contentUri = Uri.fromFile(pictureFile);
+                uploadImageToFirebase(pictureFile.getName(), contentUri);
+                onBackPressed();
+            }
+        });
+
+        notInfBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contentUri = Uri.fromFile(pictureFile);
+                uploadImageToFirebase(pictureFile.getName(), contentUri);
+                onBackPressed();
+            }
+        });
+
     }
 // if no permission request it to use the camera
     private void askCameraPermissions() {
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
-        }else {
-            dispatchTakePictureIntent();
-     Toast.makeText(Scan.this, "TEST ELSE Camera permission.", Toast.LENGTH_SHORT).show();
-        }
+            ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);}
+//        }else {
+//            dispatchTakePictureIntent();
+//     Toast.makeText(Scan.this, "TEST ELSE Camera permission.", Toast.LENGTH_SHORT).show();
+//        }
 
     }
 
@@ -98,7 +173,8 @@ public class Scan extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == CAMERA_PERM_CODE){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                dispatchTakePictureIntent();
+                recreate();
+               // dispatchTakePictureIntent();
             }else {
           // If the user deny the request to use the camera
                 Toast.makeText(this, "Camera Permission is Required to Use camera.", Toast.LENGTH_SHORT).show();
@@ -227,4 +303,44 @@ public class Scan extends AppCompatActivity {
         }
     }
 
+    // Method for safely retrieving camera UI
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try {
+            c = Camera.open(); // attempt to get a Camera instance
+        }
+        catch (Exception e){
+            // Camera is not available (in use or does not exist)
+        }
+        return c; // returns null if camera is unavailable
+    }
+
+    // Create a File for saving an image or video
+    private static File getOutputMediaFile(int type){
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "ClusterScan");
+
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                Log.d("MyCameraApp", "failed to create directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE){
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "IMG_"+ timeStamp + ".jpg");
+        } else {
+            return null;
+        }
+
+        return mediaFile;
+    }
+
 }
+

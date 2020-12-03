@@ -87,7 +87,7 @@ public class Register extends AppCompatActivity {
                     return;
                 }
 
-                if(con_password != password ){
+                if(!(password.equals(con_password))){
                     mPassword.setError("Passwords do not match");
                     return;
                 }
