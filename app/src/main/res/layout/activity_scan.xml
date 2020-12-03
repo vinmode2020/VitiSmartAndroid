@@ -31,7 +31,7 @@
         android:layout_height="45dp"
         android:layout_marginTop="204dp"
         android:background="#098F0E"
-        android:text="SCAN"
+        android:text="capture"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.212"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +60,37 @@
         app:layout_constraintTop_toBottomOf="@+id/textview4"
         tools:srcCompat="#D2E41B" />
 
+    <Button
+        android:id="@+id/infBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#FF1515"
+        android:text="Infected"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/notInfBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="451dp" />
 
+    <Button
+        android:id="@+id/notInfBtn"
+        android:layout_width="114dp"
+        android:layout_height="47dp"
+        android:background="#098F0E"
+        android:text="Not Infected"
+        android:visibility="invisible"
+        tools:layout_editor_absoluteX="146dp"
+        tools:layout_editor_absoluteY="451dp" />
+
+    <Button
+        android:id="@+id/notSureBtn"
+        android:layout_width="92dp"
+        android:layout_height="47dp"
+        android:background="#FF9800"
+        android:text="Not sure"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/notInfBtn"
+        tools:layout_editor_absoluteY="451dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

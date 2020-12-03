@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         fStore = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
 
-        StorageReference profileRef = storageReference.child("users/"+fAuth.getCurrentUser().getUid()+"/profile.jpg");
+    //    StorageReference profileRef = storageReference.child("users/"+fAuth.getCurrentUser().getUid()+"/profile.jpg");
 
         resendCode = findViewById(R.id.resendCode);
         verifyMsg = findViewById(R.id.verifyMsg);
@@ -178,12 +178,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick (View v){
                 Intent intent = new Intent(MainActivity.this, Login.class);
-                // code to log out
-                //
-                //
-
-                startActivity(intent);
-
+                FirebaseAuth.getInstance().signOut();
+                  startActivity(intent);
             }
         });
 

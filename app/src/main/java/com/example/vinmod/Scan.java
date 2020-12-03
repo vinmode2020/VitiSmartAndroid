@@ -42,9 +42,9 @@ public class Scan extends AppCompatActivity {
     Button cameraBtn,galleryBtn;
     String currentPhotoPath;
     StorageReference storageReference;
+    Button infBtn ,notSureBtn;
+    Button notInfBtn;
 
-    // testing
-    // Uri photoURI = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +55,11 @@ public class Scan extends AppCompatActivity {
         cameraBtn = findViewById(R.id.cameraBtn);
         galleryBtn = findViewById(R.id.galleryBtn);
         storageReference = FirebaseStorage.getInstance().getReference();
+        infBtn = findViewById(R.id.infBtn);
+        notInfBtn = findViewById(R.id.notInfBtn);
+        notSureBtn = findViewById(R.id.notInfBtn);
+
+
 
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,6 +73,11 @@ public class Scan extends AppCompatActivity {
             public void onClick(View v) {
                 Intent gallery = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(gallery, GALLERY_REQUEST_CODE);
+                // Now make the three buttons visible
+                infBtn.setVisibility(View.VISIBLE);
+                notInfBtn.setVisibility(View.VISIBLE);
+                notSureBtn.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -78,7 +88,7 @@ public class Scan extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
         }else {
             dispatchTakePictureIntent();
-//            Toast.makeText(Scan.this, "ELSE Camera permission.", Toast.LENGTH_SHORT).show();
+     Toast.makeText(Scan.this, "TEST ELSE Camera permission.", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -192,12 +202,14 @@ public class Scan extends AppCompatActivity {
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
+         Toast.makeText(Scan.this, "TEST dispatchTakePictureIntent ", Toast.LENGTH_SHORT).show();
+
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 
             // Create the File where the photo should go
             File photoFile = null;
             try {
-              //  Toast.makeText(Scan.this, " IF null Camera", Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(Scan.this, "TEST IF null Camera", Toast.LENGTH_SHORT).show();
 
                 photoFile = createImageFile();
             } catch (IOException ex) {

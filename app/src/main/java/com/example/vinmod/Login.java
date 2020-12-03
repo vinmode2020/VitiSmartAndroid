@@ -35,8 +35,8 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mEmail = findViewById(R.id.Email);
-        mPassword = findViewById(R.id.password);
+        mEmail = findViewById(R.id.loginEmail);
+        mPassword = findViewById(R.id.loginPass);
         progressBar = findViewById(R.id.progressBar);
         fAuth = FirebaseAuth.getInstance();
         mLoginBtn = findViewById(R.id.loginBtn);
@@ -66,7 +66,7 @@ public class Login extends AppCompatActivity {
                     return;
                 }
 
-                progressBar.setVisibility(View.VISIBLE);
+              //   progressBar.setVisibility(View.VISIBLE);
 
                 // authenticate the user
                 fAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -85,14 +85,17 @@ public class Login extends AppCompatActivity {
 
             }
         });
-        // if the user click create a new account
-//        mCreateBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(getApplicationContext(),Register.class));
-//            }
-//        });
+/*
 
+      //  if the user click create a new account
+  mCreateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),Register.class));
+            }
+        });
+
+ */
         // If user click on "Forget you password"
         forgotTextLink.setOnClickListener(new View.OnClickListener() {
             @Override
