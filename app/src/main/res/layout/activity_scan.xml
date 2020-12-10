@@ -28,13 +28,14 @@
         android:id="@+id/stepDesc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         android:fontFamily="sans-serif-light"
         android:text="Take a picture of the grape cluster."
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="#D2E41B"
         android:textColorHighlight="#FFFEFE"
         android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/camera_preview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/stepCounter"
@@ -44,21 +45,22 @@
         android:id="@+id/cameraBtn"
         android:layout_width="100dp"
         android:layout_height="45dp"
-        android:layout_marginTop="204dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="48dp"
         android:background="#098F0E"
         android:text="capture"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.212"
+        app:layout_constraintHorizontal_bias="0.237"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/displayImageView" />
+        app:layout_constraintTop_toBottomOf="@+id/camera_preview"
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/galleryBtn"
         android:layout_width="100dp"
         android:layout_height="45dp"
-        android:layout_marginTop="204dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="48dp"
         android:background="#098F0E"
         android:text="Gallery"
@@ -66,7 +68,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.765"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/displayImageView" />
+        app:layout_constraintTop_toBottomOf="@+id/camera_preview"
+        app:layout_constraintVertical_bias="1.0" />
 
     <FrameLayout
         android:id="@+id/camera_preview"

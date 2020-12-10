@@ -46,6 +46,8 @@ public class Scan extends AppCompatActivity {
     public static final int CAMERA_REQUEST_CODE = 102;
     public static final int GALLERY_REQUEST_CODE = 105;
     public static final int STORAGE_PER_CODE = 103;
+    public int currentCode;
+    String galleryFileName;
 
 
 
@@ -116,6 +118,7 @@ public class Scan extends AppCompatActivity {
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                currentCode = CAMERA_REQUEST_CODE;
                 cameraBtn.setVisibility(View.INVISIBLE);
                 galleryBtn.setVisibility(View.INVISIBLE);
                 preview.setVisibility(View.INVISIBLE);
@@ -132,9 +135,14 @@ public class Scan extends AppCompatActivity {
         galleryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                currentCode = GALLERY_REQUEST_CODE;
                 Intent gallery = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(gallery, GALLERY_REQUEST_CODE);
+                cameraBtn.setVisibility(View.INVISIBLE);
+                galleryBtn.setVisibility(View.INVISIBLE);
+                preview.setVisibility(View.INVISIBLE);
                 // Now make the three buttons visible
+                selectedImage.setVisibility(View.VISIBLE);
                 infBtn.setVisibility(View.VISIBLE);
                 notInfBtn.setVisibility(View.VISIBLE);
                 notSureBtn.setVisibility(View.VISIBLE);
@@ -145,8 +153,13 @@ public class Scan extends AppCompatActivity {
         infBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                contentUri = Uri.fromFile(pictureFile);
-                uploadImageToFirebase(pictureFile.getName(), contentUri);
+                if(currentCode == CAMERA_REQUEST_CODE){
+                    contentUri = Uri.fromFile(pictureFile);
+                    uploadImageToFirebase(pictureFile.getName(), contentUri);
+                }
+                else if (currentCode == GALLERY_REQUEST_CODE){
+                    uploadImageToFirebase(galleryFileName, contentUri);
+                }
                 onBackPressed();
             }
         });
@@ -154,8 +167,14 @@ public class Scan extends AppCompatActivity {
         notInfBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                contentUri = Uri.fromFile(pictureFile);
-                uploadImageToFirebase(pictureFile.getName(), contentUri);
+                if(currentCode == CAMERA_REQUEST_CODE){
+                    contentUri = Uri.fromFile(pictureFile);
+                    uploadImageToFirebase(pictureFile.getName(), contentUri);
+                }
+                else if (currentCode == GALLERY_REQUEST_CODE){
+                    uploadImageToFirebase(galleryFileName, contentUri);
+                }
+
                 onBackPressed();
             }
         });
@@ -211,17 +230,17 @@ public class Scan extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                File f = new File(currentPhotoPath);
-                selectedImage.setImageURI(Uri.fromFile(f));
-                Log.d("tag", "ABsolute Url of Image is " + Uri.fromFile(f));
+                pictureFile = new File(currentPhotoPath);
+                selectedImage.setImageURI(Uri.fromFile(pictureFile));
+                Log.d("tag", "ABsolute Url of Image is " + Uri.fromFile(pictureFile));
 
                 // more info https://developer.android.com/training/camera/photobasics#java
                 // Post the picture in the phone gallery.
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                Uri contentUri = Uri.fromFile(f);
+                Uri contentUri = Uri.fromFile(pictureFile);
                 mediaScanIntent.setData(contentUri);
                 this.sendBroadcast(mediaScanIntent);
-                uploadImageToFirebase(f.getName(), contentUri);
+             //   uploadImageToFirebase(f.getName(), contentUri);
 
             }
 
@@ -229,14 +248,14 @@ public class Scan extends AppCompatActivity {
 
         if (requestCode == GALLERY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                Uri contentUri = data.getData();
+                contentUri = data.getData();
                 String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                 String imageFileName = "JPEG_" + timeStamp + "." + getFileExt(contentUri);
                 Log.d("tag", "onActivityResult: Gallery Image Uri:  " + imageFileName);
                 // Display the image on the app
                 selectedImage.setImageURI(contentUri);
-
-                uploadImageToFirebase(imageFileName, contentUri);
+                galleryFileName = imageFileName;
+             //   uploadImageToFirebase(imageFileName, contentUri);
 
 
             }
