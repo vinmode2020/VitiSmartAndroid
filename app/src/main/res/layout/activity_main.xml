@@ -120,7 +120,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/button_rpage3"
+        android:id="@+id/button_map"
         android:layout_width="161dp"
         android:layout_height="124dp"
         android:layout_marginBottom="4dp"

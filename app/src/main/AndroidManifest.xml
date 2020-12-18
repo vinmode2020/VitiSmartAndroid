@@ -4,14 +4,17 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+
     <uses-feature android:name="android.hardware.location.gps" />
-
-
 
     <application
         android:allowBackup="true"
@@ -20,7 +23,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.VinMod">
-        <activity android:name=".Scan"></activity>
+
+        <!--  Added for the Google API   -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCAr7HZOJRkRyEuva_B4Ag04VaNCMts6TM" />
+
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity android:name=".Map"></activity>
+        <activity android:name=".Scan" />
         <activity android:name=".Resource" />
         <activity android:name=".Login" />
         <activity android:name=".Register">
@@ -29,6 +42,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!--  Added for the Google API   -->
+            <meta-data
+                android:name="com.google.android.geo.API_KEY"
+                android:value="Your Api Key" />
         </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -38,14 +55,10 @@
             </intent-filter>
         </activity>
 
-
         <meta-data
             android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
-
-        <!-- dded for the camera -->
+            android:resource="@array/preloaded_fonts" /> <!-- dded for the camera -->
         <!-- https://developer.android.com/training/camera/photobasics#java -->
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.android.fileprovider"
@@ -53,11 +66,8 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
-
-
-
     </application>
 
 </manifest>

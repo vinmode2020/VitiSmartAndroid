@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     String userId;
     Button resendCode;
     Button button_rpage;
-    Button button_scan, button_logout;
+    Button button_scan, button_logout, button_map;
     Button resetPassLocal;
     FirebaseUser user;
     StorageReference storageReference;
@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         button_rpage = findViewById(R.id.button_rpage);
         button_scan = findViewById(R.id.button_scan);
         button_logout = findViewById(R.id.button_logout);
+        button_map = findViewById(R.id.button_map);
+
 
         fAuth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
@@ -181,6 +183,17 @@ public class MainActivity extends AppCompatActivity {
                   startActivity(intent);
             }
         });
+
+        // Click the scan button
+        button_map.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick (View v){
+                Intent intent = new Intent(MainActivity.this, Map.class);
+                FirebaseAuth.getInstance().signOut();
+                startActivity(intent);
+            }
+        });
+
 
 
 
