@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     String userId;
     Button resendCode;
     Button button_rpage;
-    Button button_scan, button_logout, button_map;
+    Button button_scan, button_logout, button_map, button_dboard;
     Button resetPassLocal;
     FirebaseUser user;
     StorageReference storageReference;
@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         button_scan = findViewById(R.id.button_scan);
         button_logout = findViewById(R.id.button_logout);
         button_map = findViewById(R.id.button_map);
+        button_dboard = findViewById(R.id.button_dboard);
 
 
         fAuth = FirebaseAuth.getInstance();
@@ -194,7 +195,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        // Click the Discussion board button
+        button_dboard.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick (View v){
+                Intent intent = new Intent(MainActivity.this, Discussion.class);
+                FirebaseAuth.getInstance().signOut();
+                startActivity(intent);
+            }
+        });
 
 
     }

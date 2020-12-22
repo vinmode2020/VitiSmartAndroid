@@ -32,7 +32,7 @@
         android:background="#EDF3F2"
         android:ems="10"
         android:hint="  Email"
-        android:inputType="textPersonName"
+        android:inputType="textAutoComplete"
         android:rotationY="2"
         android:singleLine="false"
         android:textColor="#4CAF50"
@@ -61,7 +61,7 @@
         android:background="#EDF3F2"
         android:ems="10"
         android:hint="  Password"
-        android:inputType="textPersonName"
+        android:inputType="textPassword"
         android:rotationY="2"
         android:singleLine="false"
         android:textColor="#4CAF50"
@@ -69,7 +69,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.558"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/loginEmail"
+        app:passwordToggleEnabled="true" />
 
     <EditText
         android:id="@+id/forgotPassword"
@@ -96,6 +97,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/forgotPassword" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

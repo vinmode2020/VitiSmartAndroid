@@ -21,47 +21,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textview2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:text="VinMod"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="#D2E41B"
-        android:textColorHighlight="#FFFEFE"
-        android:textSize="55sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.213" />
-
     <Button
         android:id="@+id/button_logout"
         android:layout_width="151dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="36dp"
         android:onClick="logout"
         android:text="Logout"
         app:backgroundTint="#098F0E"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.157"
+        app:layout_constraintHorizontal_bias="0.196"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/resetPasswordLocal"
         android:layout_width="151dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="32dp"
-        android:onClick="logout"
+        android:layout_marginBottom="36dp"
         android:text="Reset Password"
         app:backgroundTint="#098F0E"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.873"
+        app:layout_constraintHorizontal_bias="0.807"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -69,7 +51,6 @@
         android:layout_width="108dp"
         android:layout_height="57dp"
         android:layout_marginTop="8dp"
-        android:onClick="logout"
         android:text="Resend email"
         android:visibility="invisible"
         app:backgroundTint="#098F0E"
@@ -82,55 +63,54 @@
         android:id="@+id/button_dboard"
         android:layout_width="161dp"
         android:layout_height="124dp"
-        android:layout_marginBottom="120dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="132dp"
+        android:background="#FFFFFF"
         android:text="discussion board"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.866"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/button_rpage"
         android:layout_width="161dp"
         android:layout_height="124dp"
-        android:layout_marginBottom="120dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="128dp"
         android:fadingEdge="none"
         android:text="Resource Page"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.164"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/button_scan"
         android:layout_width="161dp"
         android:layout_height="124dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="8dp"
         android:fadingEdge="none"
         android:text="upload    cluster"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
         app:layout_constraintBottom_toTopOf="@+id/button_rpage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.164"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/button_map"
         android:layout_width="161dp"
         android:layout_height="124dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="8dp"
         android:fadingEdge="none"
         android:text="View your heatmap"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
         app:layout_constraintBottom_toTopOf="@+id/button_dboard"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.868"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -155,8 +135,9 @@
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textview2" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <TextView
         android:id="@+id/profileEmail"
@@ -169,5 +150,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profileName" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="133dp"
+        android:layout_height="151dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/resendCode"
+        app:srcCompat="@drawable/logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
