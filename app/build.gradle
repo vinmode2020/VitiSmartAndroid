@@ -40,8 +40,11 @@ dependencies {
 
     // To hide the password
     implementation 'com.google.android.material:material:1.0.0'
+
+    //noinspection GradleCompatible
     implementation 'com.android.support:design:20'
- //   implementation "com.android.support:support-core-utils:28.0.0"
+
+    //implementation "com.android.support:support-core-utils:28.0.0"
 
     // added to fix import com.squareup.picasso.Picasso; in Scan
     implementation 'com.squareup.picasso:picasso:2.71828'
@@ -54,7 +57,10 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     //Image sliding
     implementation "androidx.viewpager:viewpager:1.0.0"
+
+    //noinspection GradleCompatible
     implementation 'com.android.support:design:23.1.1'
+    //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:28.0.0'
 
     testImplementation 'junit:junit:4.+'
