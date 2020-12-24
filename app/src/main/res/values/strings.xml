@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">VinMod</string>
+    <string name="test_text">Test Text</string>
 </resources>

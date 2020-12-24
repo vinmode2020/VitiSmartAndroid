@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/darkgreen1">
+
+    <!-- The Logo of our App -->
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_above="@+id/rimage2"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="165dp"
+        android:layout_marginEnd="166dp"
+        android:layout_marginBottom="30dp"
+        app:srcCompat="@drawable/logo" />
+
+    <!-- The resource Image that Users will be looking at. -->
+    <ImageView
+        android:id="@+id/rimage2"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:layout_above="@id/resourcesTab2Description"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="50dp"
+        android:visibility="visible"
+        app:srcCompat="@drawable/img2" />
+
+    <!-- Text description that the user can read to better understand the resource Image. -->
+    <TextView
+        android:id="@+id/resourcesTab2Description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="105dp"
+        android:text="Description:      Absolutely fantastic picture of the best grapes."
+        android:textAlignment="center"
+        android:background="#7EEC7A"
+
+        />
+
+</RelativeLayout>
