@@ -7,4 +7,16 @@
     android:background="@drawable/darkgreen1"
     tools:context=".Discussion">
 
+
+    <Button
+        android:id="@+id/newPost_Btn"
+        android:layout_width="185dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="#098F0E"
+        android:text="New Post"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

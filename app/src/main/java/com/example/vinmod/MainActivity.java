@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick (View v){
                 Intent intent = new Intent(MainActivity.this, Map.class);
-                FirebaseAuth.getInstance().signOut();
+               // FirebaseAuth.getInstance().signOut();
                 startActivity(intent);
             }
         });
@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick (View v){
                 Intent intent = new Intent(MainActivity.this, Discussion.class);
-                FirebaseAuth.getInstance().signOut();
+                //FirebaseAuth.getInstance().signOut();
                 startActivity(intent);
             }
         });
