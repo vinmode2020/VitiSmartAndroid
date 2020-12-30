@@ -1,12 +1,9 @@
 package com.example.vinmod;
 
 import android.os.Bundle;
-import android.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
-//import android.support.v4.view.ViewPager;
-//import android.support.v7.app.AppCompatActivity;
 
 
 /**
@@ -31,9 +28,7 @@ public class Resource extends AppCompatActivity implements TabLayout.OnTabSelect
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resource);
 
-        // TODO: 12/24/2020 Finish implementing the toolbar functionality
-        //Adding toolbar to the activity
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
 
         //Initializing the tabLayout
         tabLayout = findViewById(R.id.tabLayout);
@@ -55,6 +50,14 @@ public class Resource extends AppCompatActivity implements TabLayout.OnTabSelect
 
         //Add onTabSelectedListener to swipe views
         tabLayout.setOnTabSelectedListener(this);
+        viewPager.setOnPageChangeListener(
+                new ViewPager.SimpleOnPageChangeListener(){
+                    @Override
+                    public void onPageSelected(int position){
+                        tabLayout.getTabAt(position).select();
+                    }
+                }
+        );
 
     }
 
@@ -74,27 +77,6 @@ public class Resource extends AppCompatActivity implements TabLayout.OnTabSelect
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
     }
-
-
-
-
-/* *******OUTDATED**********
-@Override
-protected void onCreate (Bundle savedInstanceState) {
-
-super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_resource);
-
-This is the old version below!
-ImageView rimage1 = (ImageView) findViewById(R.id.rimage1);
-int imageResourse = getResources().getIdentifier("@drawable/image1", null, this.getPackageName());
-rimage1.setImageResource(imageResourse);
-
-New Version
-ViewPager viewPager = findViewById(R.id.viewPager);
-ImageAdapter adapter = new ImageAdapter(this);
-viewPager.setAdapter(adapter);
- ********OUT DATED**********/
 
 }
 
