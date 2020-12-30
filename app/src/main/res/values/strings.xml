@@ -1,3 +1,42 @@
 <resources>
     <string name="app_name">VinMod</string>
+    <string name="test_text">Test Text</string>
+    <string name="infestationHeatmap">Your Infestation Heat Map</string>
+    <string name="infestationMorePinInfo">Click on each pin to reveal more information.</string>
+    <string name="heatMapConfirmBtn">Confirm Dates</string>
+
+    <string-array name="months">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+
+    <string-array name="years">
+        <item>2010</item>
+        <item>2011</item>
+        <item>2012</item>
+        <item>2013</item>
+        <item>2014</item>
+        <item>2015</item>
+        <item>2016</item>
+        <item>2017</item>
+        <item>2018</item>
+        <item>2019</item>
+        <item>2020</item>
+        <item>2021</item>
+        <item>2022</item>
+        <item>2023</item>
+        <item>2024</item>
+    </string-array>
+
+
 </resources>

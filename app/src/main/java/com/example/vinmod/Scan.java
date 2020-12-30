@@ -179,6 +179,17 @@ public class Scan extends AppCompatActivity {
             }
         });
 
+        // This will allow the notSureBtn to connect the Scan page to the Resource page.
+        notSureBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent( Scan.this , Resource.class);
+                startActivity(intent);
+            }
+
+
+        });
+
     }
 // if no permission request it to use the camera
     private void askCameraPermissions() {
