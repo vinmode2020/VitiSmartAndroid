@@ -1,6 +1,7 @@
 package com.example.vinmod;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,12 +23,23 @@ public class Discussion extends AppCompatActivity {
     Button newPost_Btn;
     RecyclerView postList;
 
+    PostAdapter adapter;
+
     ArrayList<Post> dummyPostList = new ArrayList<Post>();
+
+    int colorCounter = 0;
+
+    int colors[] = {Color.argb(255, 86, 168, 179),
+            Color.argb(255, 255, 139, 139),
+            Color.argb(255, 235, 211, 201),
+            Color.argb(255, 136, 99, 72),
+            Color.argb(255, 250, 205, 82)};
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_discussion);
 
         Button newPost_Btn;
         dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
@@ -37,8 +49,12 @@ public class Discussion extends AppCompatActivity {
         dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
         dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
 
+        adapter = new PostAdapter(dummyPostList);
+
         newPost_Btn = findViewById(R.id.newPost_Btn);
         postList = findViewById(R.id.post_list);
+
+        postList.setAdapter(adapter);
 
         postList.setLayoutManager(new LinearLayoutManager(this));
 
@@ -60,21 +76,33 @@ public class Discussion extends AppCompatActivity {
         public final TextView postTitle;
         public final TextView postAuthor;
         public final TextView replyCount;
+        public final TextView replyText;
 
         public Post post;
 
         public PostHolder(View itemView) {
             super(itemView);
-            postTitle = findViewById(R.id.post_title);
-            postAuthor = findViewById(R.id.post_author);
-            replyCount = findViewById(R.id.reply_count);
+            postTitle = itemView.findViewById(R.id.postName);
+            postAuthor = itemView.findViewById(R.id.post_author);
+            replyCount = itemView.findViewById(R.id.reply_count);
+            replyText = itemView.findViewById(R.id.textView8);
         }
 
         public void bind(Post currentPost){
             post = currentPost;
             postTitle.setText(post.getTitle());
-            postAuthor.setText(post.getUserName());
-            replyCount.setText(post.getReplyCount());
+            postTitle.setBackgroundColor(colors[colorCounter]);
+
+            postAuthor.setText("By " + post.getUserName());
+            postAuthor.setBackgroundColor(colors[colorCounter]);
+
+            replyCount.setText(Integer.toString(post.getReplyCount()));
+            replyCount.setBackgroundColor(colors[colorCounter]);
+
+            replyText.setBackgroundColor(colors[colorCounter]);
+
+            colorCounter++;
+            if (colorCounter == 5) colorCounter = 0;
         }
     }
 
@@ -83,7 +111,13 @@ public class Discussion extends AppCompatActivity {
         private ArrayList<Post> postArrayList;
 
         public PostAdapter(ArrayList<Post> x){
-            postArrayList = x;
+            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
+            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
+            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
+            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
+            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
+            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
+            postArrayList = dummyPostList;
         }
 
         @NonNull

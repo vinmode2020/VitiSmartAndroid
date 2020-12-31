@@ -8,25 +8,62 @@
     tools:context=".Discussion">
 
 
+    <TextView
+        android:id="@+id/stepCounter2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-thin"
+        android:text="VinMod Discussion Forum"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#D2E41B"
+        android:textColorHighlight="#FFFEFE"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.038" />
+
+    <TextView
+        android:id="@+id/stepDesc2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="sans-serif-light"
+        android:text='To view a post, simply tap on it.  To add a new post, tap "New Post."'
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#D2E41B"
+        android:textColorHighlight="#FFFEFE"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/newPost_Btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stepCounter2" />
+
     <Button
         android:id="@+id/newPost_Btn"
         android:layout_width="185dp"
         android:layout_height="45dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="112dp"
         android:backgroundTint="#098F0E"
         android:text="New Post"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/post_list"
-        android:layout_width="413dp"
-        android:layout_height="630dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="416dp"
+        android:layout_height="446dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="64dp"
+        android:scrollbarStyle="outsideInset"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.571"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/newPost_Btn" />
+        app:layout_constraintTop_toBottomOf="@+id/newPost_Btn"
+        app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>
