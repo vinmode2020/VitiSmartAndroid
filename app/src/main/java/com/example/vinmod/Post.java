@@ -1,12 +1,16 @@
 package com.example.vinmod;
 
 public class Post {
+    private String id;
+    private String date;
     private String title;
     private String text;
     private String userName;
     private int replyCount;
 
-    public Post(String w, String x, String y, int z){
+    public Post(String u, String v, String w, String x, String y, int z){
+        this.id = u;
+        this.date = v;
         this.title = w;
         this.text = x;
         this.userName = y;
@@ -43,5 +47,13 @@ public class Post {
 
     public void setReplyCount(int replyCount) {
         this.replyCount = replyCount;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getDate() {
+        return date;
     }
 }

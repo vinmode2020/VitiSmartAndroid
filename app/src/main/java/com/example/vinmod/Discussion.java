@@ -15,13 +15,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Discussion extends AppCompatActivity {
 
     Button newPost_Btn;
     RecyclerView postList;
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference dbRef = database.getReference("/posts");
 
     PostAdapter adapter;
 
@@ -42,21 +53,14 @@ public class Discussion extends AppCompatActivity {
         setContentView(R.layout.activity_discussion);
 
         Button newPost_Btn;
-        dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
-        dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
-        dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
-        dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
-        dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
-        dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
 
-        adapter = new PostAdapter(dummyPostList);
+
+
 
         newPost_Btn = findViewById(R.id.newPost_Btn);
         postList = findViewById(R.id.post_list);
 
-        postList.setAdapter(adapter);
 
-        postList.setLayoutManager(new LinearLayoutManager(this));
 
         // Click the Discussion board button
 
@@ -70,6 +74,42 @@ public class Discussion extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        ValueEventListener queryValueListener = new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
+                Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
+
+                while (iterator.hasNext()) {
+                    DataSnapshot next = (DataSnapshot) iterator.next();
+                    dummyPostList.add(new Post(next.getKey().toString(), next.child("date").getValue().toString(), next.child("title").getValue().toString(), next.child("text").getValue().toString(), next.child("author").getValue().toString(), Integer.parseInt(next.child("replyCount").getValue().toString())));
+                }
+
+                adapter = new PostAdapter(dummyPostList);
+
+                postList.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        Query query = dbRef.orderByKey();
+        query.addListenerForSingleValueEvent(queryValueListener);
+
+
+
+        postList.setLayoutManager(new LinearLayoutManager(this));
     }
 
     public class PostHolder extends RecyclerView.ViewHolder{
@@ -111,12 +151,7 @@ public class Discussion extends AppCompatActivity {
         private ArrayList<Post> postArrayList;
 
         public PostAdapter(ArrayList<Post> x){
-            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
-            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
-            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
-            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
-            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
-            dummyPostList.add(new Post("hfjdskl", "hvreufidjsk", "hvurefi", 43));
+
             postArrayList = dummyPostList;
         }
 
