@@ -38,6 +38,8 @@ dependencies {
     // Declare the dependency for the Realtime Database library
     implementation 'com.google.firebase:firebase-database'
 
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
 

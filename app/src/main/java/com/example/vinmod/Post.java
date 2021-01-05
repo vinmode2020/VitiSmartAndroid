@@ -17,6 +17,15 @@ public class Post {
         this.replyCount = z;
     }
 
+    public Post(Post p){
+        this.id = p.getId();
+        this.date = p.getDate();
+        this.title = p.getTitle();
+        this.text = p.getText();
+        this.userName = p.getUserName();
+        this.replyCount = p.getReplyCount();
+    }
+
     public String getText() {
         return text;
     }

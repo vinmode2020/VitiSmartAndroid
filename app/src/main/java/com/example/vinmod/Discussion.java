@@ -12,6 +12,8 @@ import android.widget.TextView;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,21 +50,14 @@ public class Discussion extends AppCompatActivity {
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discussion);
 
         Button newPost_Btn;
 
-
-
-
         newPost_Btn = findViewById(R.id.newPost_Btn);
         postList = findViewById(R.id.post_list);
-
-
-
-        // Click the Discussion board button
 
         // Listener for "new post" button
         newPost_Btn.setOnClickListener(new View.OnClickListener() {
@@ -112,7 +107,7 @@ public class Discussion extends AppCompatActivity {
         postList.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    public class PostHolder extends RecyclerView.ViewHolder{
+    public class PostHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public final TextView postTitle;
         public final TextView postAuthor;
         public final TextView replyCount;
@@ -126,6 +121,11 @@ public class Discussion extends AppCompatActivity {
             postAuthor = itemView.findViewById(R.id.post_author);
             replyCount = itemView.findViewById(R.id.reply_count);
             replyText = itemView.findViewById(R.id.textView8);
+
+            postTitle.setOnClickListener(this);
+            postAuthor.setOnClickListener(this);
+            replyCount.setOnClickListener(this);
+            replyText.setOnClickListener(this);
         }
 
         public void bind(Post currentPost){
@@ -143,6 +143,19 @@ public class Discussion extends AppCompatActivity {
 
             colorCounter++;
             if (colorCounter == 5) colorCounter = 0;
+        }
+
+        @Override
+        public void onClick(View view){
+            Intent intent = new Intent(Discussion.this, ViewPost.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("POST_ID", post.getId());
+            bundle.putString("POST_DATE", post.getDate());
+            bundle.putString("POST_AUTHOR", post.getUserName());
+            bundle.putString("POST_TITLE", post.getTitle());
+            bundle.putString("POST_CONTENT", post.getText());
+            intent.putExtras(bundle);
+            startActivity(intent);
         }
     }
 
