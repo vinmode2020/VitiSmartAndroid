@@ -9,11 +9,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,7 +23,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class Discussion extends AppCompatActivity {
 
@@ -38,7 +34,7 @@ public class Discussion extends AppCompatActivity {
 
     PostAdapter adapter;
 
-    ArrayList<Post> dummyPostList = new ArrayList<Post>();
+    ArrayList<Post> discussionPosts = new ArrayList<Post>();
 
     int colorCounter = 0;
 
@@ -64,7 +60,7 @@ public class Discussion extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Discussion.this, NewPost.class);
-
+                startActivity(intent);
             }
         });
 
@@ -74,6 +70,8 @@ public class Discussion extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        discussionPosts = new ArrayList<Post>();
 
         ValueEventListener queryValueListener = new ValueEventListener() {
 
@@ -85,10 +83,10 @@ public class Discussion extends AppCompatActivity {
 
                 while (iterator.hasNext()) {
                     DataSnapshot next = (DataSnapshot) iterator.next();
-                    dummyPostList.add(new Post(next.getKey().toString(), next.child("date").getValue().toString(), next.child("title").getValue().toString(), next.child("text").getValue().toString(), next.child("author").getValue().toString(), Integer.parseInt(next.child("replyCount").getValue().toString())));
+                    discussionPosts.add(new Post(next.getKey().toString(), next.child("date").getValue().toString(), next.child("title").getValue().toString(), next.child("text").getValue().toString(), next.child("author").getValue().toString(), Integer.parseInt(next.child("replyCount").getValue().toString())));
                 }
 
-                adapter = new PostAdapter(dummyPostList);
+                adapter = new PostAdapter(discussionPosts);
 
                 postList.setAdapter(adapter);
             }
@@ -165,7 +163,7 @@ public class Discussion extends AppCompatActivity {
 
         public PostAdapter(ArrayList<Post> x){
 
-            postArrayList = dummyPostList;
+            postArrayList = discussionPosts;
         }
 
         @NonNull

@@ -11,61 +11,94 @@
         android:id="@+id/publish_Btn"
         android:layout_width="179dp"
         android:layout_height="43dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="32dp"
         android:backgroundTint="#098F0E"
-        android:text="Publish"
         android:maxLength="40"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.455"
+        android:text="Publish"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/cancel_btn"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="639dp"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/post_title_details2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-light"
+        android:text="Create New Post"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#D2E41B"
+        android:textColorHighlight="#FFFEFE"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@+id/textView3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/cancel_btn"
+        android:layout_width="179dp"
+        android:layout_height="43dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="#817D7D"
+        android:maxLength="40"
+        android:text="Cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="MissingConstraints" />
 
     <EditText
-        android:id="@+id/editTextTextPersonName"
+        android:id="@+id/edit_body"
         android:layout_width="332dp"
         android:layout_height="375dp"
         android:layout_marginBottom="24dp"
         android:background="@color/white"
         android:backgroundTint="@color/white"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:inputType="textMultiLine"
         android:maxLength="1500"
         app:layout_constraintBottom_toTopOf="@+id/publish_Btn"
-        tools:layout_editor_absoluteX="39dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints" />
 
     <EditText
-        android:id="@+id/editTextTextPersonName2"
+        android:id="@+id/edit_title"
         android:layout_width="327dp"
         android:layout_height="53dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="8dp"
         android:background="@color/white"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:inputType="textCapSentences"
         app:layout_constraintBottom_toTopOf="@+id/textView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView3"
-        android:layout_width="84dp"
-        android:layout_height="39dp"
-        android:layout_marginBottom="16dp"
-        android:text="Subject"
+        android:layout_width="112dp"
+        android:layout_height="38dp"
+        android:gravity="center"
+        android:text="Post Title"
         android:textColor="@color/white"
         android:textColorHighlight="#EFD707"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/editTextTextPersonName2"
-        tools:layout_editor_absoluteX="163dp" />
+        app:layout_constraintBottom_toTopOf="@+id/edit_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="58dp"
-        android:layout_height="35dp"
+        android:layout_height="0dp"
         android:text="Body"
         android:textColor="@color/white"
         android:textColorHighlight="#EFD707"
         android:textSize="24sp"
-        tools:layout_editor_absoluteX="173dp"
-        tools:layout_editor_absoluteY="191dp" />
+        app:layout_constraintBottom_toTopOf="@+id/edit_body"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
