@@ -46,8 +46,11 @@ public class NewPost extends AppCompatActivity {
             public void onClick(View v) {
 
                 if(!postTitle.getText().toString().isEmpty() && !postContent.getText().toString().isEmpty()){
-                    SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy-hh-mm-ss");
-                    String format = date.format(new Date());
+                    SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy 'at' hh:mm:ss");
+                    SimpleDateFormat dateSortable = new SimpleDateFormat("yyyyMMddHHmmss");
+
+                    String formatDate = date.format(new Date());
+                    String formatDateSortable = dateSortable.format(new Date());
 
                     user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -55,8 +58,8 @@ public class NewPost extends AppCompatActivity {
 
                     Post newPost = new Post(
                             UUID.randomUUID().toString().replace("-", ""),
-                            format, postTitle.getText().toString(),
-                            postContent.getText().toString(),
+                            formatDate, postTitle.getText().toString(),
+                            postContent.getText().toString().trim(),
                             screenName, 0
                     );
 
@@ -65,6 +68,7 @@ public class NewPost extends AppCompatActivity {
                     databaseReference.child("posts").child(newPost.getId());
                     databaseReference.child("posts").child(newPost.getId()).child("author").setValue(newPost.getUserName());
                     databaseReference.child("posts").child(newPost.getId()).child("date").setValue(newPost.getDate());
+                    databaseReference.child("posts").child(newPost.getId()).child("dateSortable").setValue(formatDateSortable);
                     databaseReference.child("posts").child(newPost.getId()).child("replyCount").setValue(newPost.getReplyCount());
                     databaseReference.child("posts").child(newPost.getId()).child("text").setValue(newPost.getText());
                     databaseReference.child("posts").child(newPost.getId()).child("title").setValue(newPost.getTitle());

@@ -22,6 +22,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 public class Discussion extends AppCompatActivity {
@@ -86,6 +87,8 @@ public class Discussion extends AppCompatActivity {
                     discussionPosts.add(new Post(next.getKey().toString(), next.child("date").getValue().toString(), next.child("title").getValue().toString(), next.child("text").getValue().toString(), next.child("author").getValue().toString(), Integer.parseInt(next.child("replyCount").getValue().toString())));
                 }
 
+                Collections.reverse(discussionPosts);
+
                 adapter = new PostAdapter(discussionPosts);
 
                 postList.setAdapter(adapter);
@@ -96,11 +99,8 @@ public class Discussion extends AppCompatActivity {
 
             }
         };
-
-        Query query = dbRef.orderByKey();
+        Query query = dbRef.orderByChild("dateSortable");
         query.addListenerForSingleValueEvent(queryValueListener);
-
-
 
         postList.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -152,6 +152,7 @@ public class Discussion extends AppCompatActivity {
             bundle.putString("POST_AUTHOR", post.getUserName());
             bundle.putString("POST_TITLE", post.getTitle());
             bundle.putString("POST_CONTENT", post.getText());
+            bundle.putString("REPLY_COUNT", String.valueOf(post.getReplyCount()));
             intent.putExtras(bundle);
             startActivity(intent);
         }
