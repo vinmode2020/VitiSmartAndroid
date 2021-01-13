@@ -22,9 +22,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.VinMod">
-        <activity android:name=".ViewPost"></activity>
-        <activity android:name=".NewPost" />
-        <activity android:name=".Discussion" /> <!-- Added for the Google API -->
+        <activity android:name=".AboutUs"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ContactUs" />
+        <activity android:name=".ViewPost"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".NewPost"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Discussion"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/> <!-- Added for the Google API -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCAr7HZOJRkRyEuva_B4Ag04VaNCMts6TM" />
@@ -32,11 +43,21 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".Map" />
-        <activity android:name=".Scan" />
-        <activity android:name=".Resource" />
-        <activity android:name=".Login" />
-        <activity android:name=".Register">
+        <activity android:name=".Map"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Scan"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Resource"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Login"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Register"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -48,7 +69,9 @@
                 android:name="com.google.android.geo.API_KEY"
                 android:value="Your Api Key" />
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
