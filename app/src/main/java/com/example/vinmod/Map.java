@@ -376,11 +376,8 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
-
+        googleMap.clear(); // Clearing the map allowing for a complete reset
         LatLng eriePa = new LatLng(42.1292 , -80.0851); //Coordinates for Erie, Pa
-        latArray.clear(); lngArray.clear(); dateArray.clear(); timeArray.clear(); infectedArray.clear(); //Clearing all the Array's
-
-
         for (int x = 0; x < dateArray.size() ; x++) {   //Loop for creating all of the map markers
 
             double lat = latArray.get(x);
