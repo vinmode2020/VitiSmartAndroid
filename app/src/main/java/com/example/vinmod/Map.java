@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -27,11 +28,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -379,6 +378,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
         mMap = googleMap;
 
         LatLng eriePa = new LatLng(42.1292 , -80.0851); //Coordinates for Erie, Pa
+        latArray.clear(); lngArray.clear(); dateArray.clear(); timeArray.clear(); infectedArray.clear(); //Clearing all the Array's
 
 
         for (int x = 0; x < dateArray.size() ; x++) {   //Loop for creating all of the map markers

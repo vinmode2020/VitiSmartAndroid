@@ -9,11 +9,12 @@
 
     <EditText
         android:id="@+id/verifyMsg"
-        android:layout_width="185dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="157dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="textPersonName"
+        android:background="@drawable/new_btn1"
         android:text="Email is not verified"
         android:textColor="#FFFFFF"
         android:visibility="invisible"
@@ -23,33 +24,69 @@
 
     <Button
         android:id="@+id/button_logout"
-        android:layout_width="151dp"
-        android:layout_height="0dp"
+        android:layout_width="157dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="4dp"
         android:layout_marginBottom="36dp"
+        android:background="@drawable/new_btn1"
         android:onClick="logout"
         android:text="Logout"
         app:backgroundTint="#098F0E"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.196"
+        app:layout_constraintHorizontal_bias="0.101"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/resetPasswordLocal"
-        android:layout_width="151dp"
-        android:layout_height="0dp"
+        android:layout_width="157dp"
+        android:layout_height="46dp"
+        android:layout_marginEnd="28dp"
         android:layout_marginBottom="36dp"
+        android:background="@drawable/new_btn1"
         android:text="Reset Password"
         app:backgroundTint="#098F0E"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/contBtn"
+        android:layout_width="154dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/new_btn1"
+        android:text="Contact Us"
+        app:backgroundTint="#098F0E"
+        app:layout_constraintBottom_toTopOf="@+id/resetPasswordLocal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.807"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.894"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_dboard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/aboutUs_Btn"
+        android:layout_width="157dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/new_btn1"
+        android:text="About Us"
+        app:backgroundTint="#098F0E"
+        app:layout_constraintBottom_toTopOf="@+id/button_logout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.109"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_rpage"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/resendCode"
-        android:layout_width="108dp"
-        android:layout_height="57dp"
+        android:layout_width="90dp"
+        android:layout_height="38dp"
         android:layout_marginTop="8dp"
         android:text="Resend email"
         android:visibility="invisible"
@@ -60,26 +97,14 @@
         app:layout_constraintTop_toBottomOf="@+id/verifyMsg" />
 
     <Button
-        android:id="@+id/button_rpage"
-        android:layout_width="161dp"
-        android:layout_height="124dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginBottom="128dp"
-        android:fadingEdge="none"
-        android:text="Resource Page"
-        android:textSize="18sp"
-        app:backgroundTint="#CDDC39"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
         android:id="@+id/button_dboard"
         android:layout_width="161dp"
         android:layout_height="124dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="128dp"
+        android:layout_marginBottom="164dp"
+        android:background="@drawable/new_btn1"
         android:fadingEdge="none"
-        android:text="Discussion Board"
+        android:text="Discussion\nBoard"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -90,9 +115,10 @@
         android:layout_width="161dp"
         android:layout_height="124dp"
         android:layout_marginStart="32dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/new_btn1"
         android:fadingEdge="none"
-        android:text="upload    cluster"
+        android:text="upload\ncluster"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
         app:layout_constraintBottom_toTopOf="@+id/button_rpage"
@@ -103,9 +129,10 @@
         android:layout_width="161dp"
         android:layout_height="124dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/new_btn1"
         android:fadingEdge="none"
-        android:text="View your heatmap"
+        android:text="View your\nheatmap"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
         app:layout_constraintBottom_toTopOf="@+id/button_dboard"
@@ -113,16 +140,30 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/button_rpage"
+        android:layout_width="161dp"
+        android:layout_height="124dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="164dp"
+        android:background="@drawable/new_btn1"
+        android:fadingEdge="none"
+        android:text="Resource Page"
+        android:textSize="18sp"
+        app:backgroundTint="#CDDC39"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <TextView
         android:id="@+id/profilePhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:text="Phone"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.511"
+        app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profileEmail" />
 
@@ -130,12 +171,13 @@
         android:id="@+id/profileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="28dp"
+        android:fontFamily="@font/aref_ruqaa"
         android:text="Name"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.515"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
@@ -143,19 +185,20 @@
         android:id="@+id/profileEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="16dp"
         android:text="Email"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.882"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profileName" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="133dp"
-        android:layout_height="151dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="107dp"
+        android:layout_height="94dp"
+        android:layout_marginTop="36dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/resendCode"

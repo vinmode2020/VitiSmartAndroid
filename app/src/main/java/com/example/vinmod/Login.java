@@ -133,12 +133,15 @@ public class Login extends AppCompatActivity {
                         // close the dialog
                     }
                 });
-
                 passwordResetDialog.create().show();
-
             }
         });
 
+    }
+    // Register activity
+    public void onClick(View view) {
+        Intent intent = new Intent(Login.this, Register.class);
+        startActivity(intent);
 
     }
 }

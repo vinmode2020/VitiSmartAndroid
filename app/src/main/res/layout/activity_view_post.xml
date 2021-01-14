@@ -18,7 +18,8 @@
         android:layout_width="117dp"
         android:layout_height="39dp"
         android:layout_marginEnd="24dp"
-        android:background="#098F0E"
+        android:background="@drawable/bg_round"
+        android:backgroundTint="#4CAF50"
         android:text="Add A Reply"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,20 +27,20 @@
         app:layout_constraintVertical_bias="0.04" />
 
     <TextView
-            android:id="@+id/post_title_details"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:text="Post Title"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="#D2E41B"
-            android:textColorHighlight="#FFFEFE"
-            android:textSize="30sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.024" />
+        android:id="@+id/post_title_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/aref_ruqaa"
+        android:text="Post Title"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#D2E41B"
+        android:textColorHighlight="#FFFEFE"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.024" />
 
     <TextView
         android:id="@+id/replies_header"
@@ -47,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
-        android:fontFamily="sans-serif-light"
+        android:fontFamily="@font/aref_ruqaa"
         android:text="Replies"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="#D2E41B"
