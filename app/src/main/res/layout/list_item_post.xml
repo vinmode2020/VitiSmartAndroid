@@ -13,13 +13,27 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:background="#00BCD4"
         android:text="Post Name"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/delete_post"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/post_author" />
+
+    <TextView
+        android:id="@+id/delete_post"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:background="#00BCD4"
+        android:gravity="center_horizontal"
+        android:text="  X  "
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/reply_count"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/postName"
+        app:layout_constraintTop_toBottomOf="@+id/post_author"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/post_author"

@@ -110,6 +110,7 @@ public class Discussion extends AppCompatActivity {
         public final TextView postAuthor;
         public final TextView replyCount;
         public final TextView replyText;
+        public final TextView deleteBtn;
 
         public Post post;
 
@@ -119,6 +120,7 @@ public class Discussion extends AppCompatActivity {
             postAuthor = itemView.findViewById(R.id.post_author);
             replyCount = itemView.findViewById(R.id.reply_count);
             replyText = itemView.findViewById(R.id.textView8);
+            deleteBtn = itemView.findViewById(R.id.delete_post);
 
             postTitle.setOnClickListener(this);
             postAuthor.setOnClickListener(this);
