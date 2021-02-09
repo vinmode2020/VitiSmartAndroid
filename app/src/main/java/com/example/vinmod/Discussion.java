@@ -1,19 +1,25 @@
 package com.example.vinmod;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,9 +27,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.UUID;
 
 public class Discussion extends AppCompatActivity {
 
@@ -32,6 +41,7 @@ public class Discussion extends AppCompatActivity {
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference dbRef = database.getReference("/posts");
+    FirebaseUser user;
 
     PostAdapter adapter;
 
@@ -55,6 +65,8 @@ public class Discussion extends AppCompatActivity {
 
         newPost_Btn = findViewById(R.id.newPost_Btn);
         postList = findViewById(R.id.post_list);
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         // Listener for "new post" button
         newPost_Btn.setOnClickListener(new View.OnClickListener() {
@@ -84,7 +96,13 @@ public class Discussion extends AppCompatActivity {
 
                 while (iterator.hasNext()) {
                     DataSnapshot next = (DataSnapshot) iterator.next();
-                    discussionPosts.add(new Post(next.getKey().toString(), next.child("date").getValue().toString(), next.child("title").getValue().toString(), next.child("text").getValue().toString(), next.child("author").getValue().toString(), Integer.parseInt(next.child("replyCount").getValue().toString())));
+                    discussionPosts.add(new Post(next.getKey().toString(),
+                            next.child("date").getValue().toString(),
+                            next.child("title").getValue().toString(),
+                            next.child("text").getValue().toString(),
+                            next.child("author").getValue().toString(),
+                            Integer.parseInt(next.child("replyCount").getValue().toString()),
+                            (next.child("authorId").exists()) ? next.child("authorId").getValue().toString() : "N/A"));
                 }
 
                 Collections.reverse(discussionPosts);
@@ -126,6 +144,8 @@ public class Discussion extends AppCompatActivity {
             postAuthor.setOnClickListener(this);
             replyCount.setOnClickListener(this);
             replyText.setOnClickListener(this);
+
+
         }
 
         public void bind(Post currentPost){
@@ -143,6 +163,40 @@ public class Discussion extends AppCompatActivity {
 
             colorCounter++;
             if (colorCounter == 5) colorCounter = 0;
+
+            if(user.getUid().compareTo(post.getAuthorId()) == 0) {
+                deleteBtn.setText(" X ");
+                deleteBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final AlertDialog.Builder removePostDialog = new AlertDialog.Builder(v.getContext());
+                        removePostDialog.setTitle("Delete Post");
+                        removePostDialog.setMessage("Are you sure you want to delete this post?");
+
+                        removePostDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dbRef.child(post.getId()).removeValue();
+                                Toast.makeText(Discussion.this, "Post successfully deleted!", Toast.LENGTH_SHORT).show();
+                                finish();
+                                startActivity(getIntent());
+                            }
+                        });
+
+                        removePostDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // close
+                            }
+                        });
+
+                        removePostDialog.create().show();
+                    }
+                });
+            }
+            else{
+                deleteBtn.setText("");
+            }
         }
 
         @Override

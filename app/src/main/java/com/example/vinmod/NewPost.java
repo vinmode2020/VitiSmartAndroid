@@ -60,12 +60,13 @@ public class NewPost extends AppCompatActivity {
                             UUID.randomUUID().toString().replace("-", ""),
                             formatDate, postTitle.getText().toString(),
                             postContent.getText().toString().trim(),
-                            screenName, 0
+                            screenName, 0, user.getUid()
                     );
 
                     databaseReference = FirebaseDatabase.getInstance().getReference();
 
                     databaseReference.child("posts").child(newPost.getId());
+                    databaseReference.child("posts").child(newPost.getId()).child("authorId").setValue(newPost.getAuthorId());
                     databaseReference.child("posts").child(newPost.getId()).child("author").setValue(newPost.getUserName());
                     databaseReference.child("posts").child(newPost.getId()).child("date").setValue(newPost.getDate());
                     databaseReference.child("posts").child(newPost.getId()).child("dateSortable").setValue(formatDateSortable);

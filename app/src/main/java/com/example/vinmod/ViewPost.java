@@ -78,7 +78,8 @@ public class ViewPost extends AppCompatActivity {
                 extras.getString("POST_TITLE"),
                 extras.getString("POST_CONTENT"),
                 extras.getString("POST_AUTHOR"),
-                Integer.parseInt(extras.getString("REPLY_COUNT"))
+                Integer.parseInt(extras.getString("REPLY_COUNT")),
+                ""
         );
 
         postTitle = findViewById(R.id.post_title_details);

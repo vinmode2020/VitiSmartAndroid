@@ -2,19 +2,21 @@ package com.example.vinmod;
 
 public class Post {
     private String id;
+    private String authorId;
     private String date;
     private String title;
     private String text;
     private String userName;
     private int replyCount;
 
-    public Post(String u, String v, String w, String x, String y, int z){
+    public Post(String u, String v, String w, String x, String y, int z, String t){
         this.id = u;
         this.date = v;
         this.title = w;
         this.text = x;
         this.userName = y;
         this.replyCount = z;
+        this.authorId = t;
     }
 
     public Post(Post p){
@@ -24,6 +26,14 @@ public class Post {
         this.text = p.getText();
         this.userName = p.getUserName();
         this.replyCount = p.getReplyCount();
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public String getText() {
