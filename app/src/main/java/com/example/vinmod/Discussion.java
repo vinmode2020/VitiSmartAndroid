@@ -4,11 +4,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,21 +29,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.UUID;
 
 public class Discussion extends AppCompatActivity {
 
     Button newPost_Btn;
     RecyclerView postList;
+    Spinner sortOptions;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference dbRef = database.getReference("/posts");
     FirebaseUser user;
+
+    Boolean isDescending = true;
 
     PostAdapter adapter;
 
@@ -66,6 +68,8 @@ public class Discussion extends AppCompatActivity {
         newPost_Btn = findViewById(R.id.newPost_Btn);
         postList = findViewById(R.id.post_list);
 
+        createSpinner();
+
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         // Listener for "new post" button
@@ -80,43 +84,46 @@ public class Discussion extends AppCompatActivity {
 
     }
 
+    ValueEventListener queryValueListener = new ValueEventListener() {
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
+            Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
+
+            while (iterator.hasNext()) {
+                DataSnapshot next = (DataSnapshot) iterator.next();
+                discussionPosts.add(new Post(next.getKey().toString(),
+                        next.child("date").getValue().toString(),
+                        next.child("title").getValue().toString(),
+                        next.child("text").getValue().toString(),
+                        next.child("author").getValue().toString(),
+                        Integer.parseInt(next.child("replyCount").getValue().toString()),
+                        (next.child("authorId").exists()) ? next.child("authorId").getValue().toString() : "N/A"));
+            }
+
+            if(isDescending){
+                Collections.reverse(discussionPosts);
+            }
+
+            adapter = new PostAdapter(discussionPosts);
+
+            postList.setAdapter(adapter);
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
     @Override
     protected void onStart() {
         super.onStart();
 
         discussionPosts = new ArrayList<Post>();
 
-        ValueEventListener queryValueListener = new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
-                Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
-
-                while (iterator.hasNext()) {
-                    DataSnapshot next = (DataSnapshot) iterator.next();
-                    discussionPosts.add(new Post(next.getKey().toString(),
-                            next.child("date").getValue().toString(),
-                            next.child("title").getValue().toString(),
-                            next.child("text").getValue().toString(),
-                            next.child("author").getValue().toString(),
-                            Integer.parseInt(next.child("replyCount").getValue().toString()),
-                            (next.child("authorId").exists()) ? next.child("authorId").getValue().toString() : "N/A"));
-                }
-
-                Collections.reverse(discussionPosts);
-
-                adapter = new PostAdapter(discussionPosts);
-
-                postList.setAdapter(adapter);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
         Query query = dbRef.orderByChild("dateSortable");
         query.addListenerForSingleValueEvent(queryValueListener);
 
@@ -241,6 +248,44 @@ public class Discussion extends AppCompatActivity {
         public int getItemCount() {
             return postArrayList.size();
         }
+    }
+
+    public void createSpinner(){
+        sortOptions = findViewById(R.id.sort_options);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.filter_options, R.layout.spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        sortOptions.setAdapter(adapter);
+
+        sortOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { //startMonthSpinner listener
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                discussionPosts = new ArrayList<>();
+
+                if(position == 0){
+                    isDescending = true;
+                    Query query = dbRef.orderByChild("dateSortable");
+                    query.addListenerForSingleValueEvent(queryValueListener);
+                }
+                else if(position == 1){
+                    isDescending = false;
+                    Query query = dbRef.orderByChild("dateSortable");
+                    query.addListenerForSingleValueEvent(queryValueListener);
+                }
+                else if(position == 2){
+                    isDescending = true;
+                    Query query = dbRef.orderByChild("replyCount");
+                    query.addListenerForSingleValueEvent(queryValueListener);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 }

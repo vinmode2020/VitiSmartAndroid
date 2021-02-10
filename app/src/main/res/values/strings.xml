@@ -71,6 +71,13 @@
         <item>2023</item>
         <item>2024</item>
     </string-array>
+
+    <string-array name="filter_options">
+        <item>Date(newest)</item>
+        <item>Date(oldest)</item>
+        <item>Most Popular</item>
+    </string-array>
+
     <string name="title_activity_main_drawer">MainActivityDrawer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
