@@ -33,10 +33,17 @@ public class Resource extends AppCompatActivity implements TabLayout.OnTabSelect
         //Initializing the tabLayout
         tabLayout = findViewById(R.id.tabLayout);
 
-        //Adding tabs using addTab()
-        tabLayout.addTab(tabLayout.newTab().setText("Tab 1"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab 2"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab 3"));
+
+        tabLayout.addTab(tabLayout.newTab().setText("1"));
+        tabLayout.addTab(tabLayout.newTab().setText("2"));
+        tabLayout.addTab(tabLayout.newTab().setText("3"));
+        tabLayout.addTab(tabLayout.newTab().setText("4"));
+        tabLayout.addTab(tabLayout.newTab().setText("5"));
+        tabLayout.addTab(tabLayout.newTab().setText("6"));
+        tabLayout.addTab(tabLayout.newTab().setText("7"));
+        tabLayout.addTab(tabLayout.newTab().setText("8"));
+        tabLayout.addTab(tabLayout.newTab().setText("9"));
+        tabLayout.addTab(tabLayout.newTab().setText("10"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         //Initializing viewPager

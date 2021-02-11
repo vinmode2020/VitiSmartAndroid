@@ -57,10 +57,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
     private String endDaySpinner;
 
 
-    //Used for filtering the dates for queries in the Database
-    //private Calendar calendar = Calendar.getInstance();
-    private Date startDate;
-    private Date endDate;
+
 
     //Array's used for pins
     ArrayList<Double> latArray = new ArrayList<>();
@@ -116,23 +113,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
         return endDate;
     }
 
-    //TODO Look to change this from a Date data type to the data Type of calender
-    //Apparently Date is deprecated and should be replaced by calender.
-
-    /**
-     * Accepts our final date string and parses it into the Date data type.
-     *
-     * @param stringDate
-     * @return date
-     * @throws ParseException
-     */
-    private Date parseDate(String stringDate) throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MMM-dd", Locale.ENGLISH);
-
-        Date date = formatter.parse(stringDate);
-        return date;
-    }
-
+   
     /**
      * This method is the Event handler for our confirmDateBtn
      */
@@ -146,7 +127,6 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                         .startAt(createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner)) //Filtering the query to start at specified date
                         .endAt(createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner));  //Filtering the query to end at the specified date
 
-                //Query query1 = dbRef.equalTo("testUserID1", "userID");
 
                 query.addValueEventListener(valueEventListener);
 
@@ -162,6 +142,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
             latArray.clear(); lngArray.clear(); dateArray.clear(); timeArray.clear(); infectedArray.clear(); //Clearing all the Array's
+
             if (dataSnapshot.exists()){
                 for (DataSnapshot snapshot : dataSnapshot.getChildren() ){
                     latArray.add(Double.parseDouble(snapshot.child("gpsLat").getValue().toString()));
@@ -175,11 +156,12 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(firstPin)); //Updating the Camera position to first pin the user Query
 
             }
+            //-----Delete when finished-----//
             for (int x = 0; x <infectedArray.size();x++){
                 System.out.println("Latitude: " + latArray.get(x) + "\nLongitude: " + lngArray.get(x) +
                         "\nDate: " + dateArray.get(x) + "\nTime: " + timeArray.get(x) + "\nInfected: " + infectedArray.get(x));
             }
-
+            //-----Delete when finished-----//
         }
 
         @Override
@@ -374,6 +356,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
 
         mMap = googleMap;
         googleMap.clear(); // Clearing the map allowing for a complete reset

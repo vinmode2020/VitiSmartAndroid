@@ -46,6 +46,27 @@ public class resourcePager extends FragmentStatePagerAdapter {
             case 2:
                 resourceTab3 tab3 = new resourceTab3();
                 return tab3;
+            case 3:
+                resourceTab4 tab4 = new resourceTab4();
+                return tab4;
+            case 4:
+                resourceTab5 tab5 = new resourceTab5();
+                return tab5;
+            case 5:
+                resourceTab6 tab6 = new resourceTab6();
+                return tab6;
+            case 6:
+                resourceTab7 tab7 = new resourceTab7();
+                return tab7;
+            case 7:
+                resourceTab8 tab8 = new resourceTab8();
+                return tab8;
+            case 8:
+                resourceTab9 tab9 = new resourceTab9();
+                return tab9;
+            case 9:
+                resourceTab10 tab10 = new resourceTab10();
+                return tab10;
             default:
                 return null;
         }
