@@ -5,6 +5,36 @@
     <string name="infestationMorePinInfo">Click on each pin to reveal more information.</string>
     <string name="heatMapConfirmBtn">Confirm Dates</string>
 
+    <string name="tab1info">Grape berry moth larvae are easily detected early in the season by the presence of webs in young grape clusters. The larvae live inside the webs and feed on developing berries. Photo credit: Andrew Muza, Penn State Extension.</string>
+    <string name="tab1titlee">Figure 1. Webbing in grape berry moth infested clusters early in the growing season.</string>
+
+    <string name="tab2info">Grape berry moth larvae build webs made out of silk strands among adjacent berries. The larvae hide inside the webs before borrowing into the grape berries. Injury of grape berry moth larvae induces red discoloration in immature berries of red cultivars. Photo credit: Andrew Muza, Penn State Extension.</string>
+    <string name="tab2title">Figure 2. Webbing and red discoloration in grape berry moth infested clusters.</string>
+
+    <string name="tab3info">Injure by grape berry moth larvae induces red discoloration in immature berries of red cultivars. Photo credit: Andrew Muza, Penn State Extension.</string>
+    <string name="tab3title">Figure 3. Discoloration of a grape berry moth infested berry</string>
+
+    <string name="tab4info">Brown discoloration of grape berry moth infested berries of a white cultivar. Photo credit: Andrew Muza, Penn State Extension.</string>
+    <string name="tab4title">Figure 4. Discoloration of a grape berry moth infested berry</string>
+
+    <string name="tab5info">Wounds from grape berry moth larvae facilitate the colonization of fungi in mature grapes. Photo credit: Andrew Muza, Penn State Extension.</string>
+    <string name="tab5title">Figure 5. Damage by grape berry moth larvae and fungi late in the growing season.</string>
+
+    <string name="tab6info"></string>
+    <string name="tab6title"></string>
+
+    <string name="tab7info"></string>
+    <string name="tab7title"></string>
+
+    <string name="tab8info"></string>
+    <string name="tab8title"></string>
+
+    <string name="tab9info"></string>
+    <string name="tab9title"></string>
+
+    <string name="tab10info"></string>
+    <string name="tab10title"></string>
+
     <string-array name="months">
         <item>Jan</item>
         <item>Feb</item>
