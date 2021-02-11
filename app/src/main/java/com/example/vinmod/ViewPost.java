@@ -50,11 +50,11 @@ public class ViewPost extends AppCompatActivity {
 
     int colorCounter = 0;
 
-    int colors[] = {Color.argb(255, 86, 168, 179),
-            Color.argb(255, 255, 139, 139),
-            Color.argb(255, 235, 211, 201),
-            Color.argb(255, 136, 99, 72),
-            Color.argb(255, 250, 205, 82)};
+    int colors[] = {Color.argb(255, 86, 180, 233),
+            Color.argb(255, 230, 159, 0),
+            Color.argb(255, 0, 158, 115),
+            Color.argb(255, 240, 228, 66),
+            Color.argb(255, 204, 121, 167)};
 
     TextView postTitle;
     TextView postHeader;
