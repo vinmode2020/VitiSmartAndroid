@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">VinMod</string>
+    <string name="app_name">VitiSmart</string>
     <string name="test_text">Test Text</string>
     <string name="infestationHeatmap">Your Infestation Heat Map</string>
     <string name="infestationMorePinInfo">Click on each pin to reveal more information.</string>
