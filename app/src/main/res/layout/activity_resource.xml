@@ -6,7 +6,7 @@
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/darkgreen1"
+    android:background="@drawable/darkgreen2"
     android:orientation="vertical"
     tools:context=".Resource">
 
@@ -21,18 +21,6 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:tabIndicatorColor="@color/white"
         app:tabTextColor="@color/white" />
-
-    <ImageView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_above="@+id/rimage1"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="165dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="166dp"
-        android:layout_marginBottom="15dp"
-        app:srcCompat="@drawable/logo" />
 
     <!-- This is where the tabs page will be displayed -->
     <androidx.viewpager.widget.ViewPager

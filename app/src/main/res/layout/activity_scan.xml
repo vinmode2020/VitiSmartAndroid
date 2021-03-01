@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/darkgreen1"
+    android:background="@drawable/darkgreen2"
     tools:context=".Scan">
 
     <TextView
@@ -109,7 +109,7 @@
         android:layout_marginStart="32dp"
         android:background="@drawable/bg_round"
         android:backgroundTint="#CC1010"
-        android:text="Infected"
+        android:text="Infested"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -121,7 +121,7 @@
         android:layout_height="47dp"
         android:background="@drawable/bg_round"
         android:backgroundTint="#4CAF50"
-        android:text="Not Infected"
+        android:text="Not Infested"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/notSureBtn"

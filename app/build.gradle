@@ -95,6 +95,7 @@ dependencies {
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:2.2.2'
 
     // Discussion
     implementation fileTree(dir: 'libs', include: ['*.jar'])
