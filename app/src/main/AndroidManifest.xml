@@ -25,7 +25,8 @@
         <activity android:name=".AboutUs"
             android:configChanges="orientation"
             android:screenOrientation="portrait"/>
-        <activity android:name=".ContactUs" />
+        <activity android:name=".ContactUs" >
+        </activity>
         <activity android:name=".ViewPost"
             android:configChanges="orientation"
             android:screenOrientation="portrait"/>

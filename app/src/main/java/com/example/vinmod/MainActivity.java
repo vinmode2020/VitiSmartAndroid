@@ -3,7 +3,6 @@ package com.example.vinmod;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -212,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
         cont_Btn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick (View v){
+                /*
                 Intent intent = new Intent(Intent.ACTION_SENDTO); // it's not ACTION_SEND
                 intent.setData(Uri.parse("mailto:vinmode2020@gmail.com"));
                // intent.putExtra(Intent.EXTRA_SUBJECT, "this is my Subject of email");
@@ -222,13 +222,10 @@ public class MainActivity extends AppCompatActivity {
                 } catch (android.content.ActivityNotFoundException ex) {
                     Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                 }
-                /*
+                */
                 Intent intent = new Intent(MainActivity.this, ContactUs.class);
                 //FirebaseAuth.getInstance().signOut();
                 startActivity(intent);
-                */
-
-
 
             }
         });

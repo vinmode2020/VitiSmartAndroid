@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/joti_one"
-        android:text="VinMod"
+        android:text="VitiSmart"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="#D2E41B"
         android:textColorHighlight="#FFFEFE"

@@ -222,11 +222,9 @@ public class Discussion extends AppCompatActivity {
     }
 
     public class PostAdapter extends RecyclerView.Adapter<PostHolder> {
-
         private ArrayList<Post> postArrayList;
 
         public PostAdapter(ArrayList<Post> x){
-
             postArrayList = discussionPosts;
         }
 
@@ -234,7 +232,6 @@ public class Discussion extends AppCompatActivity {
         @Override
         public PostHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_post, parent, false);
-
             return new PostHolder(view);
         }
 

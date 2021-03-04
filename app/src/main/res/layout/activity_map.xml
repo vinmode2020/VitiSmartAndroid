@@ -20,7 +20,7 @@
         android:fontFamily="@font/aref_ruqaa"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="@string/infestationHeatmap"
+        android:text="Your Infestation Map"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textStyle="bold"

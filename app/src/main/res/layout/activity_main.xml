@@ -7,6 +7,22 @@
     android:background="@drawable/darkgreen1"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/textview2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/joti_one"
+        android:text="VitiSmart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#D2E41B"
+        android:textColorHighlight="#FFFEFE"
+        android:textSize="55sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.176" />
+
     <EditText
         android:id="@+id/verifyMsg"
         android:layout_width="157dp"
@@ -132,7 +148,7 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/new_btn1"
         android:fadingEdge="none"
-        android:text="View your\nheatmap"
+        android:text="infestation\nMap"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
         app:layout_constraintBottom_toTopOf="@+id/button_dboard"
@@ -171,7 +187,7 @@
         android:id="@+id/profileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/aref_ruqaa"
         android:text="Name"
         android:textColor="#FFFFFF"
@@ -179,7 +195,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/textview2" />
 
     <TextView
         android:id="@+id/profileEmail"
@@ -193,15 +209,5 @@
         app:layout_constraintHorizontal_bias="0.882"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="107dp"
-        android:layout_height="94dp"
-        android:layout_marginTop="36dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/resendCode"
-        app:srcCompat="@drawable/logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
