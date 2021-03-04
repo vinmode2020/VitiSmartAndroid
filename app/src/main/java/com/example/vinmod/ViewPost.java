@@ -128,17 +128,23 @@ public class ViewPost extends AppCompatActivity {
 
                         databaseReference = FirebaseDatabase.getInstance().getReference();
 
-                        databaseReference.child("posts").child(post.getId()).child("replies").child(replyId);
-                        databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("user").setValue(screenName);
-                        databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("date").setValue(formatDate);
-                        databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("dateSortable").setValue(formatDateSortable);
-                        databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("message").setValue(reply.getText().toString().trim());
-                        databaseReference.child("posts").child(post.getId()).child("replyCount").setValue(post.getReplyCount() + 1);
+                        if(reply.getText().toString().isEmpty()){
+                            Toast.makeText(ViewPost.this, "Please write a reply before submitting.", Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId);
+                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("user").setValue(screenName);
+                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("date").setValue(formatDate);
+                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("dateSortable").setValue(formatDateSortable);
+                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("message").setValue(reply.getText().toString().trim());
+                            databaseReference.child("posts").child(post.getId()).child("replyCount").setValue(post.getReplyCount() + 1);
 
-                        Toast.makeText(ViewPost.this, "Reply Successfully Added!", Toast.LENGTH_SHORT).show();
-                        getIntent().putExtra("REPLY_COUNT", String.valueOf(post.getReplyCount() + 1));
-                        finish();
-                        startActivity(getIntent());
+                            Toast.makeText(ViewPost.this, "Reply Successfully Added!", Toast.LENGTH_SHORT).show();
+                            getIntent().putExtra("REPLY_COUNT", String.valueOf(post.getReplyCount() + 1));
+                            finish();
+                            startActivity(getIntent());
+                        }
+
                     }
                 });
 

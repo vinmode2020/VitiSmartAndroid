@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -121,14 +122,79 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
         confirmDateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String startMonth, endMonth;
 
-                Query query = dbRef
-                        .orderByChild("date")   //Sorting the pins by the date they were uploaded
-                        .startAt(createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner)) //Filtering the query to start at specified date
-                        .endAt(createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner));  //Filtering the query to end at the specified date
+                switch(startMonthSpinner){
+                    case "Jan":
+                        startMonth = "1";
+                    case "Feb":
+                        startMonth = "2";
+                    case "Mar":
+                        startMonth = "3";
+                    case "Apr":
+                        startMonth = "4";
+                    case "May":
+                        startMonth = "5";
+                    case "Jun":
+                        startMonth = "6";
+                    case "Jul":
+                        startMonth = "7";
+                    case "Aug":
+                        startMonth = "8";
+                    case "Sep":
+                        startMonth = "9";
+                    case "Oct":
+                        startMonth = "10";
+                    case "Nov":
+                        startMonth = "11";
+                    default:
+                        startMonth = "12";
+
+                }
+
+                switch(endMonthSpinner){
+                    case "Jan":
+                        endMonth = "1";
+                    case "Feb":
+                        endMonth = "2";
+                    case "Mar":
+                        endMonth = "3";
+                    case "Apr":
+                        endMonth = "4";
+                    case "May":
+                        endMonth = "5";
+                    case "Jun":
+                        endMonth = "6";
+                    case "Jul":
+                        endMonth = "7";
+                    case "Aug":
+                        endMonth = "8";
+                    case "Sep":
+                        endMonth = "9";
+                    case "Oct":
+                        endMonth = "10";
+                    case "Nov":
+                        endMonth = "11";
+                    default:
+                        endMonth = "12";
+                }
+
+                double startDateSortable = Integer.parseInt(startYearSpinner + startMonth + startDaySpinner);
+                double endDateSortable = Integer.parseInt(endYearSpinner + endMonth + endDaySpinner);
+
+                if(startDateSortable > endDateSortable){
+                    Toast.makeText(Map.this, "Start date must be before end date", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Query query = dbRef
+                            .orderByChild("date")   //Sorting the pins by the date they were uploaded
+                            .startAt(createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner)) //Filtering the query to start at specified date
+                            .endAt(createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner));  //Filtering the query to end at the specified date
 
 
-                query.addValueEventListener(valueEventListener);
+                    query.addValueEventListener(valueEventListener);
+                }
+
 
             }
         });
