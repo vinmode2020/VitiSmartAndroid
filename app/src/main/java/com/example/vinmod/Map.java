@@ -210,7 +210,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                             .endAt(createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner));  //Filtering the query to end at the specified date
 
 
-                    query.addValueEventListener(valueEventListener);
+                    query.addListenerForSingleValueEvent(valueEventListener);
                 }
 
 
