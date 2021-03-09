@@ -1,7 +1,10 @@
 package com.example.vinmod;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,24 +18,37 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Registry;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 //https://console.cloud.google.com/apis/credentials?authuser=1&project=vinmod&supportedpurview=project
@@ -57,19 +73,21 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
     private String endYearSpinner;
     private String endDaySpinner;
 
-
-
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageReference = storage.getReference();
 
     //Array's used for pins
     ArrayList<Double> latArray = new ArrayList<>();
     ArrayList<Double> lngArray = new ArrayList<>();
     ArrayList<String> dateArray = new ArrayList<>();
     ArrayList<String> timeArray = new ArrayList<>();
-    ArrayList<Boolean> infectedArray = new ArrayList<>();
+    ArrayList<Boolean> infestedArray = new ArrayList<>();
+    ArrayList<String> imageLinkArray = new ArrayList<>();
 
     //Connecting to Firebase
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference dbRef = database.getReference("/testPicture");
+    DatabaseReference dbRef = database.getReference("/Pins/" + user.getUid());
 
 
 
@@ -187,7 +205,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                 }
                 else{
                     Query query = dbRef
-                            .orderByChild("date")   //Sorting the pins by the date they were uploaded
+                            .orderByChild("Date")   //Sorting the pins by the date they were uploaded
                             .startAt(createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner)) //Filtering the query to start at specified date
                             .endAt(createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner));  //Filtering the query to end at the specified date
 
@@ -201,21 +219,30 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
     }
 
+    @com.bumptech.glide.annotation.GlideModule
+    public class GlideModule extends AppGlideModule{
+        @Override
+        public void registerComponents(Context context, Glide glide, Registry registry){
+            registry.append(StorageReference.class, InputStream.class, new FirebaseImageLoader.Factory());
+        }
+    }
+
     /**
      * ValueEventListener for our query statement being executed inside our ConfirmDateBtnListener()
      */
     ValueEventListener valueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-            latArray.clear(); lngArray.clear(); dateArray.clear(); timeArray.clear(); infectedArray.clear(); //Clearing all the Array's
+            latArray.clear(); lngArray.clear(); dateArray.clear(); timeArray.clear(); infestedArray.clear(); imageLinkArray.clear(); //Clearing all the Arrays
 
             if (dataSnapshot.exists()){
                 for (DataSnapshot snapshot : dataSnapshot.getChildren() ){
+                    imageLinkArray.add("pictures/" + user.getUid() + "/" + snapshot.getKey().replace("-", "."));
                     latArray.add(Double.parseDouble(snapshot.child("gpsLat").getValue().toString()));
                     lngArray.add(Double.parseDouble(snapshot.child("gpsLng").getValue().toString()));
-                    dateArray.add(snapshot.child("date").getValue().toString());
-                    timeArray.add(snapshot.child("time").getValue().toString());
-                    infectedArray.add(Boolean.parseBoolean(snapshot.child("infected").getValue().toString()));
+                    dateArray.add(snapshot.child("Date").getValue().toString());
+                    timeArray.add(snapshot.child("Time").getValue().toString());
+                    infestedArray.add(Boolean.parseBoolean(snapshot.child("Status").getValue().toString()));
                 }
                 onMapReady(mMap); //Adding users pins to the map
                 LatLng firstPin = new LatLng(latArray.get(0), lngArray.get(0)); //Setting a new LatLng Variable to update camera to first pin
@@ -223,9 +250,9 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
             }
             //-----Delete when finished-----//
-            for (int x = 0; x <infectedArray.size();x++){
-                System.out.println("Latitude: " + latArray.get(x) + "\nLongitude: " + lngArray.get(x) +
-                        "\nDate: " + dateArray.get(x) + "\nTime: " + timeArray.get(x) + "\nInfected: " + infectedArray.get(x));
+            for (int x = 0; x <infestedArray.size();x++){
+                System.out.println("Image Link: " + imageLinkArray.get(x) + "\nLatitude: " + latArray.get(x) + "\nLongitude: " + lngArray.get(x) +
+                        "\nDate: " + dateArray.get(x) + "\nTime: " + timeArray.get(x) + "\nInfested: " + infestedArray.get(x));
             }
             //-----Delete when finished-----//
         }
@@ -423,6 +450,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
+        HashMap<Integer, Task<Uri>> markerMap = new HashMap<Integer, Task<Uri>>();
 
         mMap = googleMap;
         googleMap.clear(); // Clearing the map allowing for a complete reset
@@ -433,16 +461,39 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
             double lng = lngArray.get(x);
             String dateArrayHolder = dateArray.get(x);
             String timeArrayHolder = timeArray.get(x);
-            boolean infectedArrayHolder = infectedArray.get(x);
+            String imageArrayHolder = imageLinkArray.get(x);
+            boolean infestedArrayHolder = infestedArray.get(x);
 
-            MarkerOptions place = new MarkerOptions().position(new LatLng(lat, lng))    //Adding the Date the picture was taken and the time.
-                    .title("Date: "+ dateArrayHolder).snippet("Time: "+timeArrayHolder);
+            Marker place;
+            //place.showInfoWindow();
 
-            if (!infectedArrayHolder){  //If the cluster is not infected it'll will set the color of the marker to blue
-                place.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            if (!infestedArrayHolder){  //If the cluster is not infested it will set the color of the marker to blue
+                place = googleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))    //Adding the Date the picture was taken and the time.
+                        .title("Recorded on "+ dateArrayHolder + " at "+timeArrayHolder).snippet(getString(R.string.mapLink)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+            }
+            else{
+                place = googleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))    //Adding the Date the picture was taken and the time.
+                        .title("Recorded on "+ dateArrayHolder + " at "+timeArrayHolder).snippet(getString(R.string.mapLink)));
             }
 
-            googleMap.addMarker(place); //Adding the marker To the map
+            place.setTag(x);
+
+            markerMap.put(x, storageReference.child(imageLinkArray.get(x)).getDownloadUrl());
+
+            int finalX = x;
+            googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                @Override
+                public void onInfoWindowClick(Marker marker) {
+                    Task<Uri> link = markerMap.get(marker.getTag());
+                    Intent intent = new Intent(Intent.ACTION_VIEW, link.getResult());
+                    startActivity(intent);
+
+
+                    //Toast.makeText(Map.this, link.getResult().toString(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            //googleMap.addMarker(place); //Adding the marker To the map
 
         }
 
@@ -453,7 +504,9 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
+            // here to request the missing permissions, and then
+            //How to overlay two images in Android to set an ImageView?www.tutorialspoint.com › how-to-overlay-two-images-i...
+            //Sep 11, 2019 — This example demonstrates how do I overlay two images In Android to set an ImageView.Step 1 − Create a new project in Android Studio, ...overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation

@@ -45,6 +45,8 @@
     <string name="tab10title">Grape berry moth adult</string>
     <string name="tab10credit">Photo credit: Flor E. Acevedo, Penn State University</string>
 
+    <string name="mapLink"><a href="google.com">Tap to View Image</a></string>
+
     <string-array name="months">
         <item>Jan</item>
         <item>Feb</item>

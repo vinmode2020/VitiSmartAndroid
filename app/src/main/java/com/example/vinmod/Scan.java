@@ -1,11 +1,19 @@
 package com.example.vinmod;
 
 import android.Manifest;
+
+import androidx.exifinterface.media.ExifInterface;
+
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.hardware.Camera;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,6 +36,10 @@ import androidx.core.content.FileProvider;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -50,12 +62,13 @@ public class Scan extends AppCompatActivity {
     String galleryFileName;
 
 
-
+    DatabaseReference databaseReference;
+    LocationManager locationManager;
     ImageView selectedImage;
-    Button cameraBtn,galleryBtn;
+    Button cameraBtn, galleryBtn;
     String currentPhotoPath;
     StorageReference storageReference;
-    Button infBtn ,notSureBtn;
+    Button infBtn, notSureBtn;
     Button notInfBtn;
     Camera mCamera;
     CameraPreview mPreview;
@@ -63,6 +76,13 @@ public class Scan extends AppCompatActivity {
     TextView stepDescription;
     File pictureFile;
     Uri contentUri;
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+    String imageDate;
+    String imageTime;
+    String imageLat;
+    String imageLon;
+    String imageStatus;
 
     private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
 
@@ -70,7 +90,7 @@ public class Scan extends AppCompatActivity {
         public void onPictureTaken(byte[] data, Camera camera) {
 
             pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            if (pictureFile == null){
+            if (pictureFile == null) {
                 Log.d("PICTURE", "Error creating media file, check storage permissions");
                 return;
             }
@@ -106,6 +126,9 @@ public class Scan extends AppCompatActivity {
         notInfBtn = findViewById(R.id.notInfBtn);
         notSureBtn = findViewById(R.id.notSureBtn);
 
+        locationManager = (LocationManager)
+                getSystemService(Context.LOCATION_SERVICE);
+
         askCameraPermissions();
         askStoragePermissions();
 
@@ -136,7 +159,7 @@ public class Scan extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 currentCode = GALLERY_REQUEST_CODE;
-                Intent gallery = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(gallery, GALLERY_REQUEST_CODE);
                 cameraBtn.setVisibility(View.INVISIBLE);
                 galleryBtn.setVisibility(View.INVISIBLE);
@@ -153,12 +176,12 @@ public class Scan extends AppCompatActivity {
         infBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(currentCode == CAMERA_REQUEST_CODE){
+                if (currentCode == CAMERA_REQUEST_CODE) {
                     contentUri = Uri.fromFile(pictureFile);
-                    uploadImageToFirebase(pictureFile.getName(), contentUri);
-                }
-                else if (currentCode == GALLERY_REQUEST_CODE){
-                    uploadImageToFirebase(galleryFileName, contentUri);
+                    imageStatus = "true";
+                    uploadImageToFirebase(pictureFile.getName(), contentUri, true);
+                } else if (currentCode == GALLERY_REQUEST_CODE) {
+                    uploadImageToFirebase(galleryFileName, contentUri, false);
                 }
                 onBackPressed();
             }
@@ -167,12 +190,12 @@ public class Scan extends AppCompatActivity {
         notInfBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(currentCode == CAMERA_REQUEST_CODE){
+                if (currentCode == CAMERA_REQUEST_CODE) {
                     contentUri = Uri.fromFile(pictureFile);
-                    uploadImageToFirebase(pictureFile.getName(), contentUri);
-                }
-                else if (currentCode == GALLERY_REQUEST_CODE){
-                    uploadImageToFirebase(galleryFileName, contentUri);
+                    imageStatus = "false";
+                    uploadImageToFirebase(pictureFile.getName(), contentUri, true);
+                } else if (currentCode == GALLERY_REQUEST_CODE) {
+                    uploadImageToFirebase(galleryFileName, contentUri, false);
                 }
 
                 onBackPressed();
@@ -180,10 +203,10 @@ public class Scan extends AppCompatActivity {
         });
 
         // This will allow the notSureBtn to connect the Scan page to the Resource page.
-        notSureBtn.setOnClickListener(new View.OnClickListener(){
+        notSureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                Intent intent = new Intent( Scan.this , Resource.class);
+            public void onClick(View v) {
+                Intent intent = new Intent(Scan.this, Resource.class);
                 startActivity(intent);
             }
 
@@ -191,10 +214,12 @@ public class Scan extends AppCompatActivity {
         });
 
     }
-// if no permission request it to use the camera
+
+    // if no permission request it to use the camera
     private void askCameraPermissions() {
-        if(ContextCompat.checkSelfPermission(this,Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);}
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
+        }
 //        }else {
 //            dispatchTakePictureIntent();
 //     Toast.makeText(Scan.this, "TEST ELSE Camera permission.", Toast.LENGTH_SHORT).show();
@@ -203,32 +228,30 @@ public class Scan extends AppCompatActivity {
     }
 
 
+    // Ask for storage permission
 
-
-
-        // Ask for storage permission
     /** This is not working as of now */
     private void askStoragePermissions() {
-        if(ContextCompat.checkSelfPermission(this,Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-           ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.MANAGE_EXTERNAL_STORAGE}, STORAGE_PER_CODE );}
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE}, STORAGE_PER_CODE);
+        }
 //        }else {
 //            dispatchTakePictureIntent();
 //     Toast.makeText(Scan.this, "TEST ELSE Camera permission.", Toast.LENGTH_SHORT).show();
 //        }
 
     }
-
 
 
     // If the user granted the permission open the camera,
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == CAMERA_PERM_CODE){
-            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == CAMERA_PERM_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 recreate();
-               // dispatchTakePictureIntent();
-            }else {
-          // If the user deny the request to use the camera
+                // dispatchTakePictureIntent();
+            } else {
+                // If the user deny the request to use the camera
                 Toast.makeText(this, "Camera Permission is Required to Use camera.", Toast.LENGTH_SHORT).show();
             }
         }
@@ -243,7 +266,7 @@ public class Scan extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 pictureFile = new File(currentPhotoPath);
                 selectedImage.setImageURI(Uri.fromFile(pictureFile));
-                Log.d("tag", "ABsolute Url of Image is " + Uri.fromFile(pictureFile));
+                Log.d("tag", "Absolute Uri of Image is " + Uri.fromFile(pictureFile));
 
                 // more info https://developer.android.com/training/camera/photobasics#java
                 // Post the picture in the phone gallery.
@@ -251,7 +274,7 @@ public class Scan extends AppCompatActivity {
                 Uri contentUri = Uri.fromFile(pictureFile);
                 mediaScanIntent.setData(contentUri);
                 this.sendBroadcast(mediaScanIntent);
-             //   uploadImageToFirebase(f.getName(), contentUri);
+                //   uploadImageToFirebase(f.getName(), contentUri);
 
             }
 
@@ -265,8 +288,9 @@ public class Scan extends AppCompatActivity {
                 Log.d("tag", "onActivityResult: Gallery Image Uri:  " + imageFileName);
                 // Display the image on the app
                 selectedImage.setImageURI(contentUri);
+                Toast.makeText(this, contentUri.getPath(), Toast.LENGTH_SHORT).show();
                 galleryFileName = imageFileName;
-             //   uploadImageToFirebase(imageFileName, contentUri);
+                //   uploadImageToFirebase(imageFileName, contentUri);
 
 
             }
@@ -276,8 +300,58 @@ public class Scan extends AppCompatActivity {
 
     }
 
-    private void uploadImageToFirebase(String name, Uri contentUri) {
-        final StorageReference image = storageReference.child("pictures/" + name);
+    public static String getPath( Context context, Uri uri ) {
+        String result = null;
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = context.getContentResolver( ).query( uri, proj, null, null, null );
+        if(cursor != null){
+            if ( cursor.moveToFirst( ) ) {
+                int column_index = cursor.getColumnIndexOrThrow( proj[0] );
+                result = cursor.getString( column_index );
+            }
+            cursor.close( );
+        }
+        if(result == null) {
+            result = "Not found";
+        }
+        return result;
+    }
+
+    private void uploadImageToFirebase(String name, Uri contentUri, boolean isCapture) {
+        final StorageReference image = storageReference.child("pictures/" + user.getUid() + "/" + name);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, STORAGE_PER_CODE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, STORAGE_PER_CODE);
+            return;
+        }
+
+        LocationListener listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                imageLat = Double.toString(location.getLatitude());
+                imageLon = Double.toString(location.getLongitude());
+            }
+        };
+
+        if(isCapture){
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, listener);
+        }
+        else if (!isCapture){
+            String picturePath = getPath( getApplicationContext(), contentUri );
+            try {
+                ExifInterface exifInterface = new ExifInterface(picturePath);
+                float[] latLong = new float[2];
+                exifInterface.getLatLong(latLong);
+                imageLat = Float.toString(latLong[0]);
+                imageLon = Float.toString(latLong[1]);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(Scan.this, picturePath, Toast.LENGTH_SHORT).show();
+            }
+        }
+
         image.putFile(contentUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -288,12 +362,26 @@ public class Scan extends AppCompatActivity {
                     }
                 });
 
-                Toast.makeText(Scan.this, "Image Is Uploaded.", Toast.LENGTH_SHORT).show();
+                databaseReference = FirebaseDatabase.getInstance().getReference();
+
+                String databaseName = name.replace('.', '-');
+
+                String storageTimeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+                imageDate = storageTimeStamp.substring(0, 10);
+                imageTime = storageTimeStamp.substring(11, 19);
+
+                databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("Date").setValue(imageDate);
+                databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("Time").setValue(imageTime);
+                databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("gpsLng").setValue(imageLon);
+                databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("gpsLat").setValue(imageLat);
+                databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("Status").setValue(imageStatus);
+
+                //Toast.makeText(Scan.this, "Image Is Uploaded.", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(Scan.this, "Upload Failled.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Scan.this, "Upload Failed.", Toast.LENGTH_SHORT).show();
             }
         });
 
