@@ -181,6 +181,7 @@ public class Scan extends AppCompatActivity {
                     imageStatus = "true";
                     uploadImageToFirebase(pictureFile.getName(), contentUri, true);
                 } else if (currentCode == GALLERY_REQUEST_CODE) {
+                    imageStatus = "true";
                     uploadImageToFirebase(galleryFileName, contentUri, false);
                 }
                 onBackPressed();
@@ -195,6 +196,7 @@ public class Scan extends AppCompatActivity {
                     imageStatus = "false";
                     uploadImageToFirebase(pictureFile.getName(), contentUri, true);
                 } else if (currentCode == GALLERY_REQUEST_CODE) {
+                    imageStatus = "false";
                     uploadImageToFirebase(galleryFileName, contentUri, false);
                 }
 
@@ -288,7 +290,7 @@ public class Scan extends AppCompatActivity {
                 Log.d("tag", "onActivityResult: Gallery Image Uri:  " + imageFileName);
                 // Display the image on the app
                 selectedImage.setImageURI(contentUri);
-                Toast.makeText(this, contentUri.getPath(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, contentUri.getPath(), Toast.LENGTH_SHORT).show();
                 galleryFileName = imageFileName;
                 //   uploadImageToFirebase(imageFileName, contentUri);
 
@@ -367,6 +369,14 @@ public class Scan extends AppCompatActivity {
         image.putFile(contentUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                int counter = 0;
+
+                if(imageLat == null || imageLon == null){
+                    Toast.makeText(Scan.this, "Picture not uploaded, error fetching GPS coordinates.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 image.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {

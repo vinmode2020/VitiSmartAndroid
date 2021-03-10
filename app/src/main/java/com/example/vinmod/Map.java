@@ -465,8 +465,6 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
             boolean infestedArrayHolder = infestedArray.get(x);
 
             Marker place;
-            //place.showInfoWindow();
-
             if (!infestedArrayHolder){  //If the cluster is not infested it will set the color of the marker to blue
                 place = googleMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))    //Adding the Date the picture was taken and the time.
                         .title("Recorded on "+ dateArrayHolder + " at "+timeArrayHolder).snippet(getString(R.string.mapLink)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
@@ -485,11 +483,11 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                 @Override
                 public void onInfoWindowClick(Marker marker) {
                     Task<Uri> link = markerMap.get(marker.getTag());
-                    Intent intent = new Intent(Intent.ACTION_VIEW, link.getResult());
+                    Intent intent = new Intent(Map.this, MapImage.class);
+                    Bundle extras = new Bundle();
+                    extras.putString("IMAGE_URI", link.getResult().toString());
+                    intent.putExtras(extras);
                     startActivity(intent);
-
-
-                    //Toast.makeText(Map.this, link.getResult().toString(), Toast.LENGTH_SHORT).show();
                 }
             });
 
