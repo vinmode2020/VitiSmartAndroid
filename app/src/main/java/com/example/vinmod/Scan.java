@@ -24,6 +24,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,6 +71,7 @@ public class Scan extends AppCompatActivity {
     StorageReference storageReference;
     Button infBtn, notSureBtn;
     Button notInfBtn;
+    ProgressBar progressBar;
     Camera mCamera;
     CameraPreview mPreview;
     TextView stepCounter;
@@ -125,6 +127,7 @@ public class Scan extends AppCompatActivity {
         infBtn = findViewById(R.id.infBtn);
         notInfBtn = findViewById(R.id.notInfBtn);
         notSureBtn = findViewById(R.id.notSureBtn);
+        progressBar = findViewById(R.id.scan_progressbar);
 
         locationManager = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
@@ -176,6 +179,10 @@ public class Scan extends AppCompatActivity {
         infBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                infBtn.setEnabled(false);
+                notInfBtn.setEnabled(false);
+                notSureBtn.setEnabled(false);
+                progressBar.setVisibility(View.VISIBLE);
                 if (currentCode == CAMERA_REQUEST_CODE) {
                     contentUri = Uri.fromFile(pictureFile);
                     imageStatus = "true";
@@ -184,13 +191,18 @@ public class Scan extends AppCompatActivity {
                     imageStatus = "true";
                     uploadImageToFirebase(galleryFileName, contentUri, false);
                 }
-                onBackPressed();
+
+                //onBackPressed();
             }
         });
 
         notInfBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                infBtn.setEnabled(false);
+                notInfBtn.setEnabled(false);
+                notSureBtn.setEnabled(false);
+                progressBar.setVisibility(View.VISIBLE);
                 if (currentCode == CAMERA_REQUEST_CODE) {
                     contentUri = Uri.fromFile(pictureFile);
                     imageStatus = "false";
@@ -200,7 +212,7 @@ public class Scan extends AppCompatActivity {
                     uploadImageToFirebase(galleryFileName, contentUri, false);
                 }
 
-                onBackPressed();
+                //onBackPressed();
             }
         });
 
@@ -366,23 +378,37 @@ public class Scan extends AppCompatActivity {
             }
         }
 
+
+
         image.putFile(contentUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                int counter = 0;
-
                 if(imageLat == null || imageLon == null){
                     Toast.makeText(Scan.this, "Picture not uploaded, error fetching GPS coordinates.", Toast.LENGTH_SHORT).show();
+                    image.delete();
+                    onBackPressed();
                     return;
                 }
+                else if (imageLat.compareTo("0.0") == 0 && imageLon.compareTo("0.0") == 0){
+                    Toast.makeText(Scan.this, "Picture not uploaded, image has no GPS coordinates.", Toast.LENGTH_SHORT).show();
+                    image.delete();
+                    onBackPressed();
+                    return;
+                }
+
+                final boolean[] uploadFinished = {false};
 
                 image.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
                         Log.d("tag", "onSuccess: Uploaded Image URl is " + uri.toString());
+                        uploadFinished[0] = true;
                     }
                 });
+
+//                while(!uploadFinished[0]){
+//                    Log.d("tag", "waiting for upload...");
+//                }
 
                 databaseReference = FirebaseDatabase.getInstance().getReference();
 
@@ -398,7 +424,8 @@ public class Scan extends AppCompatActivity {
                 databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("gpsLat").setValue(imageLat);
                 databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("Status").setValue(imageStatus);
 
-                //Toast.makeText(Scan.this, "Image Is Uploaded.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Scan.this, "Upload Successful!", Toast.LENGTH_SHORT).show();
+                onBackPressed();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
