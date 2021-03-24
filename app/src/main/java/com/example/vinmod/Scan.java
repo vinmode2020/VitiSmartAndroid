@@ -4,6 +4,7 @@ import android.Manifest;
 
 import androidx.exifinterface.media.ExifInterface;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -17,6 +18,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +37,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,6 +56,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -59,6 +67,8 @@ public class Scan extends AppCompatActivity {
     public static final int CAMERA_REQUEST_CODE = 102;
     public static final int GALLERY_REQUEST_CODE = 105;
     public static final int STORAGE_PER_CODE = 103;
+    public static final int LOCATION_PER_CODE = 106;
+    public static final int MEDIA_LOCATION_CODE = 107;
     public int currentCode;
     String galleryFileName;
 
@@ -79,6 +89,8 @@ public class Scan extends AppCompatActivity {
     File pictureFile;
     Uri contentUri;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+    FusedLocationProviderClient fusedLocationProviderClient;
 
     String imageDate;
     String imageTime;
@@ -135,6 +147,8 @@ public class Scan extends AppCompatActivity {
         askCameraPermissions();
         askStoragePermissions();
 
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
         mCamera = getCameraInstance();
 
         mPreview = new CameraPreview(this, mCamera);
@@ -155,6 +169,7 @@ public class Scan extends AppCompatActivity {
                 stepCounter.setText("Step 2");
                 stepDescription.setText("Review the image and confirm its status.");
                 mCamera.takePicture(null, null, mPicture);
+                askLocationPermissions();
             }
         });
 
@@ -223,8 +238,6 @@ public class Scan extends AppCompatActivity {
                 Intent intent = new Intent(Scan.this, Resource.class);
                 startActivity(intent);
             }
-
-
         });
 
     }
@@ -241,13 +254,30 @@ public class Scan extends AppCompatActivity {
 
     }
 
+    private void askLocationPermissions(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PER_CODE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PER_CODE);
+            return;
+        }
+    }
+
+    private void askMediaLocationPermissions(){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_MEDIA_LOCATION}, MEDIA_LOCATION_CODE);
+        }
+    }
+
 
     // Ask for storage permission
 
     /** This is not working as of now */
     private void askStoragePermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE}, STORAGE_PER_CODE);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PER_CODE);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PER_CODE);
         }
 //        }else {
 //            dispatchTakePictureIntent();
@@ -263,7 +293,6 @@ public class Scan extends AppCompatActivity {
         if (requestCode == CAMERA_PERM_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 recreate();
-                // dispatchTakePictureIntent();
             } else {
                 // If the user deny the request to use the camera
                 Toast.makeText(this, "Camera Permission is Required to Use camera.", Toast.LENGTH_SHORT).show();
@@ -288,7 +317,6 @@ public class Scan extends AppCompatActivity {
                 Uri contentUri = Uri.fromFile(pictureFile);
                 mediaScanIntent.setData(contentUri);
                 this.sendBroadcast(mediaScanIntent);
-                //   uploadImageToFirebase(f.getName(), contentUri);
 
             }
 
@@ -302,11 +330,7 @@ public class Scan extends AppCompatActivity {
                 Log.d("tag", "onActivityResult: Gallery Image Uri:  " + imageFileName);
                 // Display the image on the app
                 selectedImage.setImageURI(contentUri);
-                //Toast.makeText(this, contentUri.getPath(), Toast.LENGTH_SHORT).show();
                 galleryFileName = imageFileName;
-                //   uploadImageToFirebase(imageFileName, contentUri);
-
-
             }
 
         }
@@ -334,48 +358,64 @@ public class Scan extends AppCompatActivity {
     private void uploadImageToFirebase(String name, Uri contentUri, boolean isCapture) {
         final StorageReference image = storageReference.child("pictures/" + user.getUid() + "/" + name);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, STORAGE_PER_CODE);
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, STORAGE_PER_CODE);
-            return;
-        }
-
-        LocationListener listener = new LocationListener() {
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-                imageLat = Double.toString(location.getLatitude());
-                imageLon = Double.toString(location.getLongitude());
-            }
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-            @Override
-            public void onProviderEnabled(@NonNull String provider) {
-
-            }
-            @Override
-            public void onProviderDisabled(@NonNull String provider) {
-
-            }
-        };
-
         if(isCapture){
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, listener);
+            LocationRequest locationRequest = new LocationRequest()
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    .setInterval(2000)
+                    .setFastestInterval(1000);
+
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                        @Override
+                        public void onLocationResult(LocationResult locationResult) {
+                            Location location = locationResult.getLastLocation();
+                            imageLat = Double.toString(location.getLatitude());
+                            imageLon = Double.toString(location.getLongitude());
+                        }
+                    },
+                    Looper.myLooper());
         }
         else if (!isCapture){
-            String picturePath = getPath( getApplicationContext(), contentUri );
-            try {
-                ExifInterface exifInterface = new ExifInterface(picturePath);
-                float[] latLong = new float[2];
-                exifInterface.getLatLong(latLong);
-                imageLat = Float.toString(latLong[0]);
-                imageLon = Float.toString(latLong[1]);
 
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(Scan.this, picturePath, Toast.LENGTH_SHORT).show();
+            InputStream stream;
+            String picturePath;
+
+            if(android.os.Build.VERSION.SDK_INT >= 29){
+                contentUri = MediaStore.setRequireOriginal(contentUri);
+                try{
+                    stream = getContentResolver().openInputStream(contentUri);
+                    if(stream != null){
+                        try {
+                            ExifInterface exifInterface = new ExifInterface(stream);
+                            float[] latLong = new float[2];
+                            exifInterface.getLatLong(latLong);
+                            imageLat = Float.toString(latLong[0]);
+                            imageLon = Float.toString(latLong[1]);
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            //Toast.makeText(Scan.this, picturePath, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }catch(FileNotFoundException fnfe){
+                    Log.d("INPUTSTREAM_ERROR", "File was not found.");
+                    fnfe.printStackTrace();
+                }
             }
+            else{
+                picturePath = getPath( getApplicationContext(), contentUri );
+                try {
+                    ExifInterface exifInterface = new ExifInterface(picturePath);
+                    float[] latLong = new float[2];
+                    exifInterface.getLatLong(latLong);
+                    imageLat = Float.toString(latLong[0]);
+                    imageLon = Float.toString(latLong[1]);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(Scan.this, picturePath, Toast.LENGTH_SHORT).show();
+                }
+            }
+
         }
 
 
