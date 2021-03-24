@@ -10,6 +10,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.hardware.Camera;
 import android.location.Location;
@@ -59,6 +60,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
@@ -187,6 +189,7 @@ public class Scan extends AppCompatActivity {
                 infBtn.setVisibility(View.VISIBLE);
                 notInfBtn.setVisibility(View.VISIBLE);
                 notSureBtn.setVisibility(View.VISIBLE);
+                askMediaLocationPermissions();
 
             }
         });
@@ -254,7 +257,7 @@ public class Scan extends AppCompatActivity {
 
     }
 
-    private void askLocationPermissions(){
+    private void askLocationPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PER_CODE);
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PER_CODE);
@@ -262,8 +265,8 @@ public class Scan extends AppCompatActivity {
         }
     }
 
-    private void askMediaLocationPermissions(){
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION) != PackageManager.PERMISSION_GRANTED){
+    private void askMediaLocationPermissions() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_MEDIA_LOCATION}, MEDIA_LOCATION_CODE);
         }
     }
@@ -338,18 +341,18 @@ public class Scan extends AppCompatActivity {
 
     }
 
-    public static String getPath( Context context, Uri uri ) {
+    public static String getPath(Context context, Uri uri) {
         String result = null;
-        String[] proj = { MediaStore.Images.Media.DATA };
-        Cursor cursor = context.getContentResolver( ).query( uri, proj, null, null, null );
-        if(cursor != null){
-            if ( cursor.moveToFirst( ) ) {
-                int column_index = cursor.getColumnIndexOrThrow( proj[0] );
-                result = cursor.getString( column_index );
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int column_index = cursor.getColumnIndexOrThrow(proj[0]);
+                result = cursor.getString(column_index);
             }
-            cursor.close( );
+            cursor.close();
         }
-        if(result == null) {
+        if (result == null) {
             result = "Not found";
         }
         return result;
@@ -358,12 +361,22 @@ public class Scan extends AppCompatActivity {
     private void uploadImageToFirebase(String name, Uri contentUri, boolean isCapture) {
         final StorageReference image = storageReference.child("pictures/" + user.getUid() + "/" + name);
 
-        if(isCapture){
+        if (isCapture) {
             LocationRequest locationRequest = new LocationRequest()
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setInterval(2000)
                     .setFastestInterval(1000);
 
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                         @Override
                         public void onLocationResult(LocationResult locationResult) {
@@ -379,29 +392,31 @@ public class Scan extends AppCompatActivity {
             InputStream stream;
             String picturePath;
 
-            if(android.os.Build.VERSION.SDK_INT >= 29){
-                contentUri = MediaStore.setRequireOriginal(contentUri);
-                try{
-                    stream = getContentResolver().openInputStream(contentUri);
-                    if(stream != null){
-                        try {
-                            ExifInterface exifInterface = new ExifInterface(stream);
-                            float[] latLong = new float[2];
-                            exifInterface.getLatLong(latLong);
-                            imageLat = Float.toString(latLong[0]);
-                            imageLon = Float.toString(latLong[1]);
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            //Toast.makeText(Scan.this, picturePath, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }catch(FileNotFoundException fnfe){
-                    Log.d("INPUTSTREAM_ERROR", "File was not found.");
-                    fnfe.printStackTrace();
-                }
-            }
-            else{
+//            if(android.os.Build.VERSION.SDK_INT >= 29){
+//                //this.grantUriPermission(getPackageName() , contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                this.grantUriPermission(getPackageName() , contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+//                contentUri = MediaStore.setRequireOriginal(contentUri);
+//                try{
+//                    stream = getContentResolver().openInputStream(contentUri);
+//                    if(stream != null){
+//                        try {
+//                            ExifInterface exifInterface = new ExifInterface(stream);
+//                            float[] latLong = new float[2];
+//                            exifInterface.getLatLong(latLong);
+//                            imageLat = Float.toString(latLong[0]);
+//                            imageLon = Float.toString(latLong[1]);
+//
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                            //Toast.makeText(Scan.this, picturePath, Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                }catch(FileNotFoundException fnfe){
+//                    Log.d("INPUTSTREAM_ERROR", "File was not found.");
+//                    fnfe.printStackTrace();
+//                }
+//            }
+            if (1 == 1){
                 picturePath = getPath( getApplicationContext(), contentUri );
                 try {
                     ExifInterface exifInterface = new ExifInterface(picturePath);

@@ -23,6 +23,7 @@ public class resourceTab3 extends Fragment {
      * @param savedInstanceState
      * @return returns the formatted tab3.xml
      */
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.tab3, container, false);

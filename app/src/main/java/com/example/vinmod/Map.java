@@ -1,7 +1,6 @@
 package com.example.vinmod;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -18,11 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.Registry;
-import com.bumptech.glide.annotation.GlideModule;
-import com.bumptech.glide.module.AppGlideModule;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -43,13 +38,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
+
 
 //https://console.cloud.google.com/apis/credentials?authuser=1&project=vinmod&supportedpurview=project
 
@@ -219,13 +211,6 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
     }
 
-    @com.bumptech.glide.annotation.GlideModule
-    public class GlideModule extends AppGlideModule{
-        @Override
-        public void registerComponents(Context context, Glide glide, Registry registry){
-            registry.append(StorageReference.class, InputStream.class, new FirebaseImageLoader.Factory());
-        }
-    }
 
     /**
      * ValueEventListener for our query statement being executed inside our ConfirmDateBtnListener()
