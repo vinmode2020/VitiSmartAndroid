@@ -4,17 +4,14 @@ import android.Manifest;
 
 import androidx.exifinterface.media.ExifInterface;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.hardware.Camera;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -60,7 +57,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
@@ -141,7 +137,7 @@ public class Scan extends AppCompatActivity {
         infBtn = findViewById(R.id.infBtn);
         notInfBtn = findViewById(R.id.notInfBtn);
         notSureBtn = findViewById(R.id.notSureBtn);
-        progressBar = findViewById(R.id.scan_progressbar);
+        progressBar = findViewById(R.id.contact_progressbar);
 
         locationManager = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
