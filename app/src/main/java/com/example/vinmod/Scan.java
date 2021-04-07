@@ -203,7 +203,13 @@ public class Scan extends AppCompatActivity {
                     uploadImageToFirebase(pictureFile.getName(), contentUri, true);
                 } else if (currentCode == GALLERY_REQUEST_CODE) {
                     imageStatus = "true";
-                    uploadImageToFirebase(galleryFileName, contentUri, false);
+                    if(contentUri != null){
+                        uploadImageToFirebase(galleryFileName, contentUri, false);
+                    }
+                    else{
+                        Toast.makeText(Scan.this, "ERROR: No image selected.", Toast.LENGTH_SHORT).show();
+                        onBackPressed();
+                    }
                 }
 
                 //onBackPressed();
@@ -223,7 +229,13 @@ public class Scan extends AppCompatActivity {
                     uploadImageToFirebase(pictureFile.getName(), contentUri, true);
                 } else if (currentCode == GALLERY_REQUEST_CODE) {
                     imageStatus = "false";
-                    uploadImageToFirebase(galleryFileName, contentUri, false);
+                    if(contentUri != null){
+                        uploadImageToFirebase(galleryFileName, contentUri, false);
+                    }
+                    else{
+                        Toast.makeText(Scan.this, "ERROR: No image selected.", Toast.LENGTH_SHORT).show();
+                        onBackPressed();
+                    }
                 }
 
                 //onBackPressed();
@@ -582,5 +594,11 @@ public class Scan extends AppCompatActivity {
         return mediaFile;
     }
 
+    @Override
+    public void onBackPressed() {
+        mCamera.stopPreview();
+        mCamera.release();
+        super.onBackPressed();
+    }
 }
 

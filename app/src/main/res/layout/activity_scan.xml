@@ -8,10 +8,10 @@
     tools:context=".Scan">
 
     <TextView
+        android:fontFamily="@font/yeseva_one"
         android:id="@+id/stepCounter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/aref_ruqaa"
         android:text="Step 1"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="#D2E41B"
@@ -28,7 +28,6 @@
         android:id="@+id/stepDesc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/aref_ruqaa"
         android:text="Take a picture of the grape cluster."
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="#D2E41B"

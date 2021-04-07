@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:fontFamily="@font/joti_one"
+        android:fontFamily="@font/yeseva_one"
         android:text="About Us"
         android:textColor="#FFEB3B"
         android:textSize="36sp"
@@ -27,7 +27,6 @@
         android:layout_width="337dp"
         android:layout_height="0dp"
         android:layout_marginTop="60dp"
-        android:fontFamily="@font/aref_ruqaa"
         android:text="Nicholas W. Jones - Major in Computer Science -- Penn State Erie, the Behrend College
         \n\nMohamed Ibrahim - Major in Software Engineering -- Penn State Erie, the Behrend College
         \n\nDavid A. Simmons - Major in Computer Science -- Penn State Erie, the Behrend College

@@ -30,7 +30,7 @@ import com.google.firebase.storage.StorageReference;
 
 public class MainActivity extends AppCompatActivity {
     private static final int GALLERY_INTENT_CODE = 1023 ;
-    TextView fullName,email,phone,verifyMsg;
+    TextView fullName,verifyMsg;
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
     String userId;
@@ -46,9 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        phone = findViewById(R.id.profilePhone);
         fullName = findViewById(R.id.profileName);
-        email    = findViewById(R.id.profileEmail);
         resetPassLocal = findViewById(R.id.resetPasswordLocal);
         button_rpage = findViewById(R.id.button_rpage);
         button_scan = findViewById(R.id.button_scan);
@@ -103,10 +101,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if(documentSnapshot != null){
-                    phone.setText(documentSnapshot.getString("phone"));
                     fullName.setText(documentSnapshot.getString("fName"));
-                    email.setText(documentSnapshot.getString("email"));
-
                 }else {
                     Log.d("DOC_SNAPSHOT", "onEvent: Document does not exist");
                 }
@@ -242,4 +237,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        final AlertDialog.Builder addReplyDialog = new AlertDialog.Builder(this);
+        addReplyDialog.setMessage("Really logout?");
+
+        addReplyDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                MainActivity.super.onBackPressed();
+            }
+        });
+
+        addReplyDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        addReplyDialog.create().show();
+    }
 }
