@@ -17,6 +17,7 @@
         android:id="@+id/add_reply_button"
         android:layout_width="117dp"
         android:layout_height="39dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:background="@drawable/bg_round"
         android:backgroundTint="#4CAF50"
@@ -113,8 +114,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/reply_list"
-        android:layout_width="364dp"
-        android:layout_height="597dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"

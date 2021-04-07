@@ -102,13 +102,13 @@ public class MainActivity extends AppCompatActivity {
         documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if(documentSnapshot.exists()){
+                if(documentSnapshot != null){
                     phone.setText(documentSnapshot.getString("phone"));
                     fullName.setText(documentSnapshot.getString("fName"));
                     email.setText(documentSnapshot.getString("email"));
 
                 }else {
-                    Log.d("tag", "onEvent: Document do not exists");
+                    Log.d("DOC_SNAPSHOT", "onEvent: Document does not exist");
                 }
             }
         });

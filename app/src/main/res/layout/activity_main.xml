@@ -40,64 +40,61 @@
 
     <Button
         android:id="@+id/button_logout"
-        android:layout_width="157dp"
+        android:layout_width="0dp"
         android:layout_height="46dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginBottom="36dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
         android:background="@drawable/new_btn1"
-        android:onClick="logout"
         android:text="Logout"
         app:backgroundTint="#098F0E"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.101"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/resetPasswordLocal"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contBtn" />" />
 
     <Button
         android:id="@+id/resetPasswordLocal"
-        android:layout_width="157dp"
+        android:layout_width="0dp"
         android:layout_height="46dp"
-        android:layout_marginEnd="28dp"
-        android:layout_marginBottom="36dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
         android:background="@drawable/new_btn1"
         android:text="Reset Password"
         app:backgroundTint="#098F0E"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/button_logout"
+        app:layout_constraintTop_toBottomOf="@+id/aboutUs_Btn" />
 
     <Button
         android:id="@+id/contBtn"
-        android:layout_width="154dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="8dp"
+        android:layout_width="0dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="24dp"
         android:background="@drawable/new_btn1"
         android:text="Contact Us"
         app:backgroundTint="#098F0E"
-        app:layout_constraintBottom_toTopOf="@+id/resetPasswordLocal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.894"
+        app:layout_constraintEnd_toStartOf="@+id/aboutUs_Btn"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_dboard"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/button_rpage" />
 
     <Button
         android:id="@+id/aboutUs_Btn"
-        android:layout_width="157dp"
+        android:layout_width="0dp"
         android:layout_height="46dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="24dp"
         android:background="@drawable/new_btn1"
         android:text="About Us"
         app:backgroundTint="#098F0E"
-        app:layout_constraintBottom_toTopOf="@+id/button_logout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.109"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_rpage"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintStart_toEndOf="@id/contBtn"
+        app:layout_constraintTop_toBottomOf="@+id/button_dboard" />
 
     <Button
         android:id="@+id/resendCode"
@@ -114,61 +111,69 @@
 
     <Button
         android:id="@+id/button_dboard"
-        android:layout_width="161dp"
-        android:layout_height="124dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="164dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/new_btn1"
         android:fadingEdge="none"
         android:text="Discussion\nBoard"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/button_rpage"
+        app:layout_constraintTop_toBottomOf="@+id/button_map" />
 
     <Button
         android:id="@+id/button_scan"
-        android:layout_width="161dp"
-        android:layout_height="124dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginBottom="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/new_btn1"
         android:fadingEdge="none"
         android:text="upload\ncluster"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
-        app:layout_constraintBottom_toTopOf="@+id/button_rpage"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/button_map"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileName" />
 
     <Button
         android:id="@+id/button_map"
-        android:layout_width="161dp"
-        android:layout_height="124dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/new_btn1"
         android:fadingEdge="none"
         android:text="infestation\nMap"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
-        app:layout_constraintBottom_toTopOf="@+id/button_dboard"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/button_scan"
+        app:layout_constraintTop_toBottomOf="@+id/profileName" />
 
     <Button
         android:id="@+id/button_rpage"
-        android:layout_width="161dp"
-        android:layout_height="124dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginBottom="164dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/new_btn1"
         android:fadingEdge="none"
         android:text="Resource Page"
         android:textSize="18sp"
         app:backgroundTint="#CDDC39"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/button_dboard"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_scan" />
 
     <TextView
         android:id="@+id/profilePhone"
@@ -209,5 +214,20 @@
         app:layout_constraintHorizontal_bias="0.882"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
