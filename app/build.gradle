@@ -94,7 +94,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.jakewharton:butterknife:6.1.0'
-    implementation files('C:/Users/nwj5082/StudioProjects/capstoneproject2020/libs/activation.jar')
-    implementation files('C:/Users/nwj5082/StudioProjects/capstoneproject2020/libs/additionnal.jar')
-    implementation files('C:/Users/nwj5082/StudioProjects/capstoneproject2020/libs/mail.jar')
+    implementation files('../libs/activation.jar')
+    implementation files('../libs/additionnal.jar')
+    implementation files('../libs/mail.jar')
 }
