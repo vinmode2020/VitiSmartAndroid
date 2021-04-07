@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -26,6 +28,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,12 +38,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 
 //https://console.cloud.google.com/apis/credentials?authuser=1&project=vinmod&supportedpurview=project
@@ -55,7 +67,10 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
     static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 23;
     private GoogleMap mMap;
+    FirebaseFirestore fStore;
     Button confirmDateBtn;
+
+
 
     //Spinners that are used to set parameters
     private String startMonthSpinner;
@@ -79,15 +94,53 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
     //Connecting to Firebase
     FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference adminRef;
+    List<DocumentSnapshot> userList;
+    ArrayList<String> uidList = new ArrayList<String>();
     DatabaseReference dbRef = database.getReference("/Pins/" + user.getUid());
+    String currentUid = "";
+    boolean uidThreadComplete = false;
 
-
+    boolean isAdmin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_map);
         confirmDateBtn = findViewById(R.id.heatMapConfirmDateButton); //Linking confirmDateBtn to respective Button in heat map page
+
+        fStore = FirebaseFirestore.getInstance();
+
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .get()
+                .addOnCompleteListener((new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            userList = task.getResult().getDocuments();
+                            for(DocumentSnapshot ds: userList){
+                                uidList.add(ds.getId());
+                            }
+                            uidThreadComplete = true;
+                        }
+                    }
+                }));
+
+        DocumentReference documentReference = fStore.collection("users").document(user.getUid());
+
+        documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if(documentSnapshot.get("AdminStatus") != null){
+                    Toast.makeText(Map.this, "You're an admin!", Toast.LENGTH_SHORT).show();
+                    isAdmin = true;
+                }else {
+                    Log.d("DOC_SNAPSHOT", "onEvent: Document does not exist");
+                }
+            }
+        });
 
         checkPermission(); //Checking permissions
         createSpinners(); //Creating the spinners in our activity
@@ -196,21 +249,66 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                     Toast.makeText(Map.this, "Start date must be before end date", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Query query = dbRef
-                            .orderByChild("Date")   //Sorting the pins by the date they were uploaded
-                            .startAt(createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner)) //Filtering the query to start at specified date
-                            .endAt(createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner));  //Filtering the query to end at the specified date
+                    if(!isAdmin){
+                        Query query = dbRef
+                                .orderByChild("Date")   //Sorting the pins by the date they were uploaded
+                                .startAt(createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner)) //Filtering the query to start at specified date
+                                .endAt(createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner));  //Filtering the query to end at the specified date
 
 
-                    query.addListenerForSingleValueEvent(valueEventListener);
+                        query.addListenerForSingleValueEvent(valueEventListener);
+                    }
+                    else{
+                        latArray.clear(); lngArray.clear(); dateArray.clear(); timeArray.clear(); infestedArray.clear(); imageLinkArray.clear(); //Clearing all the Arrays
+
+                        Log.d("Ugh", uidList.toString());
+
+                        for(String x: uidList){
+                            dbRef = database.getReference("/Pins/" + x);
+                            currentUid = x;
+                            Query query = dbRef
+                                    .orderByChild("Date")
+                                    .startAt(createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner)) //Filtering the query to start at specified date
+                                    .endAt(createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner));  //Filtering the query to end at the specified date
+
+                            runAdminEventListener(query, x);
+                        }
+
+                    }
                 }
 
-
+                Toast.makeText(Map.this, "Dates confirmed.", Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
+    public void runAdminEventListener(Query query, String uid) {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Log.d("Ugh", currentUid);
+                        imageLinkArray.add("pictures/" + uid + "/" + snapshot.getKey().replace("-", "."));
+                        latArray.add(Double.parseDouble(snapshot.child("gpsLat").getValue().toString()));
+                        lngArray.add(Double.parseDouble(snapshot.child("gpsLng").getValue().toString()));
+                        dateArray.add(snapshot.child("Date").getValue().toString());
+                        timeArray.add(snapshot.child("Time").getValue().toString());
+                        infestedArray.add(Boolean.parseBoolean(snapshot.child("Status").getValue().toString()));
+                    }
+                    onMapReady(mMap); //Adding users pins to the map
+                    LatLng firstPin = new LatLng(latArray.get(0), lngArray.get(0)); //Setting a new LatLng Variable to update camera to first pin
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(firstPin)); //Updating the Camera position to first pin the user Query
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 
     /**
      * ValueEventListener for our query statement being executed inside our ConfirmDateBtnListener()

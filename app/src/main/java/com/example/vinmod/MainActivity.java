@@ -206,22 +206,13 @@ public class MainActivity extends AppCompatActivity {
         cont_Btn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick (View v){
-                /*
-                Intent intent = new Intent(Intent.ACTION_SENDTO); // it's not ACTION_SEND
-                intent.setData(Uri.parse("mailto:vinmode2020@gmail.com"));
-               // intent.putExtra(Intent.EXTRA_SUBJECT, "this is my Subject of email");
-               // intent.putExtra(Intent.EXTRA_TEXT, etMessage.getText().toString());
-                try {
-                    // startActivity(intent);
-                    startActivity(Intent.createChooser(intent, "Send email using..."));
-                } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                if(!user.isEmailVerified()){
+                    Toast.makeText(MainActivity.this, "ERROR: Must verify e-mail before using \"Contact Us\".", Toast.LENGTH_SHORT).show();
                 }
-                */
-                Intent intent = new Intent(MainActivity.this, ContactUs.class);
-                //FirebaseAuth.getInstance().signOut();
-                startActivity(intent);
-
+                else{
+                    Intent intent = new Intent(MainActivity.this, ContactUs.class);
+                    startActivity(intent);
+                }
             }
         });
 
