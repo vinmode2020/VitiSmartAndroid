@@ -6,6 +6,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Properties;
 
+import javax.mail.AuthenticationFailedException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -32,7 +35,8 @@ public class ContactUs extends AppCompatActivity {
     Button btSend;
     ProgressBar progressBar;
 
-
+    boolean authFailed = false;
+    boolean emailThreadComplete = false;
 
     private FirebaseUser fbaseUser;
 
@@ -63,9 +67,28 @@ public class ContactUs extends AppCompatActivity {
                     if(isOnline()){
                         EmailThread emailThread = new EmailThread();
                         emailThread.start();
-                        Toast.makeText(ContactUs.this, "Message Sent!", Toast.LENGTH_SHORT).show();
-                        emailThread.interrupt();
-                        onBackPressed();
+                        btSend.setEnabled(false);
+                        while(!emailThreadComplete){
+                            Log.d("AUTH", "Stuck in here...");
+                        }
+                        if(authFailed){
+                            btSend.setEnabled(true);
+                            Toast.makeText(ContactUs.this, "SMTP Authentication Failed. navigating to email app...", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(Intent.ACTION_SENDTO); // it's not ACTION_SEND
+                            intent.setData(Uri.parse("mailto:vinmode2020@gmail.com"));
+                            intent.putExtra(Intent.EXTRA_SUBJECT, etSubjectText);
+                            intent.putExtra(Intent.EXTRA_TEXT, etMessageText);
+                            try {
+                                // startActivity(intent);
+                                startActivity(Intent.createChooser(intent, "Send email using..."));
+                            } catch (android.content.ActivityNotFoundException ex) {
+                                Toast.makeText(ContactUs.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else{
+                            Toast.makeText(ContactUs.this, "Message Sent!", Toast.LENGTH_SHORT).show();
+                            onBackPressed();
+                        }
                     }
                     else{
                         Toast.makeText(ContactUs.this, "Message failed to send, make sure you have a reliable internet connection.", Toast.LENGTH_SHORT).show();
@@ -79,6 +102,7 @@ public class ContactUs extends AppCompatActivity {
         public void run() {
             GMailSender gMailSender = new GMailSender("vinmode2020@gmail.com", "pennstate2020", etSubject.getText().toString(), etMessage.getText().toString());
             gMailSender.sendMail();
+            emailThreadComplete = true;
         }
     }
 
@@ -134,6 +158,7 @@ public class ContactUs extends AppCompatActivity {
                 Transport.send(message);
             } catch(MessagingException me){
                 me.printStackTrace();
+                authFailed = true;
             }
         }
     }
