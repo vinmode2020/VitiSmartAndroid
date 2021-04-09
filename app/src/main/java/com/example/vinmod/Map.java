@@ -185,6 +185,9 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
         confirmDateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                latArray.clear(); lngArray.clear(); dateArray.clear(); timeArray.clear(); infestedArray.clear(); imageLinkArray.clear(); //Clearing all the Arrays
+
+                mMap.clear();
                 String startMonth, endMonth;
 
                 switch(startMonthSpinner){
@@ -316,7 +319,6 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
     ValueEventListener valueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-            latArray.clear(); lngArray.clear(); dateArray.clear(); timeArray.clear(); infestedArray.clear(); imageLinkArray.clear(); //Clearing all the Arrays
 
             if (dataSnapshot.exists()){
                 for (DataSnapshot snapshot : dataSnapshot.getChildren() ){
