@@ -49,15 +49,15 @@
 
     <Button
         android:id="@+id/heatMapConfirmDateButton"
-        android:layout_width="0dp"
-        android:layout_height="69dp"
+        android:layout_width="85dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="25dp"
-        android:layout_marginEnd="10dp"
         android:background="@drawable/bg_round"
         android:backgroundTint="#4CAF50"
         android:text="@string/heatMapConfirmBtn"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/startYearSpinner"
         app:layout_constraintTop_toBottomOf="@+id/morePinInfo" />
 
     <TextView
@@ -80,7 +80,7 @@
 
     <Spinner
         android:id="@+id/startMonthSpinner"
-        android:layout_width="75dp"
+        android:layout_width="50dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="25dp"
@@ -91,13 +91,11 @@
 
     <Spinner
         android:id="@+id/startYearSpinner"
-        android:layout_width="0dp"
+        android:layout_width="85dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="25dp"
-        android:layout_marginEnd="6dp"
         android:background="@drawable/bg_round"
-        app:layout_constraintEnd_toStartOf="@+id/heatMapConfirmDateButton"
         app:layout_constraintStart_toEndOf="@+id/startDaySpinner"
         app:layout_constraintTop_toBottomOf="@+id/morePinInfo"
         tools:ignore="MissingConstraints" />
@@ -119,7 +117,7 @@
 
     <Spinner
         android:id="@+id/endMonthSpinner"
-        android:layout_width="75dp"
+        android:layout_width="50dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
@@ -130,13 +128,11 @@
 
     <Spinner
         android:id="@+id/endYearSpinner"
-        android:layout_width="0dp"
+        android:layout_width="85dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="6dp"
         android:background="@drawable/bg_round"
-        app:layout_constraintEnd_toStartOf="@+id/heatMapConfirmDateButton"
         app:layout_constraintStart_toEndOf="@+id/endDaySpinner"
         app:layout_constraintTop_toBottomOf="@+id/startYearSpinner"
         tools:ignore="MissingConstraints" />
@@ -170,7 +166,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="25dp"
         android:layout_marginEnd="10dp"
 
         android:layout_marginBottom="10dp"
