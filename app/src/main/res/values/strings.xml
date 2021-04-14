@@ -47,6 +47,11 @@
 
     <string name="mapLink"><a href="google.com">Tap to View Image</a></string>
 
+    <string-array name="geo_options">
+        <item>Current GPS Location</item>
+        <item>Location Data From Image</item>
+    </string-array>
+
     <string-array name="months">
         <item>Jan</item>
         <item>Feb</item>

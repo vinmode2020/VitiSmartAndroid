@@ -85,6 +85,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="25dp"
         android:background="@drawable/bg_round"
+        android:backgroundTint="#C2BCBC"
         app:layout_constraintStart_toEndOf="@+id/startDate"
         app:layout_constraintTop_toBottomOf="@+id/morePinInfo"
         tools:ignore="MissingConstraints" />
@@ -96,6 +97,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="25dp"
         android:background="@drawable/bg_round"
+        android:backgroundTint="#C2BCBC"
         app:layout_constraintStart_toEndOf="@+id/startDaySpinner"
         app:layout_constraintTop_toBottomOf="@+id/morePinInfo"
         tools:ignore="MissingConstraints" />
@@ -122,6 +124,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/bg_round"
+        android:backgroundTint="#C2BCBC"
         app:layout_constraintStart_toEndOf="@+id/endDate"
         app:layout_constraintTop_toBottomOf="@+id/startMonthSpinner"
         tools:ignore="MissingConstraints" />
@@ -133,6 +136,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/bg_round"
+        android:backgroundTint="#C2BCBC"
         app:layout_constraintStart_toEndOf="@+id/endDaySpinner"
         app:layout_constraintTop_toBottomOf="@+id/startYearSpinner"
         tools:ignore="MissingConstraints" />
@@ -144,6 +148,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="25dp"
         android:background="@drawable/bg_round"
+        android:backgroundTint="#C2BCBC"
         app:layout_constraintStart_toEndOf="@+id/startMonthSpinner"
         app:layout_constraintTop_toBottomOf="@+id/morePinInfo"
         tools:ignore="MissingConstraints" />
@@ -155,6 +160,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/bg_round"
+        android:backgroundTint="#C2BCBC"
         app:layout_constraintStart_toEndOf="@+id/endMonthSpinner"
         app:layout_constraintTop_toBottomOf="@+id/startDaySpinner"
         tools:ignore="MissingConstraints" />

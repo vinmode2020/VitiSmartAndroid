@@ -2,11 +2,13 @@ package com.example.vinmod;
 
 import android.Manifest;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.exifinterface.media.ExifInterface;
 
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -14,6 +16,7 @@ import android.hardware.Camera;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Looper;
@@ -57,6 +60,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
@@ -96,11 +100,12 @@ public class Scan extends AppCompatActivity {
     String imageLon;
     String imageStatus;
 
+    boolean uploadImageInListener = false;
+
     private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-
             pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
             if (pictureFile == null) {
                 Log.d("PICTURE", "Error creating media file, check storage permissions");
@@ -182,11 +187,12 @@ public class Scan extends AppCompatActivity {
                 preview.setVisibility(View.INVISIBLE);
                 // Now make the three buttons visible
                 selectedImage.setVisibility(View.VISIBLE);
+                stepCounter.setText("Step 2");
+                stepDescription.setText("Review the image and confirm its status.");
                 infBtn.setVisibility(View.VISIBLE);
                 notInfBtn.setVisibility(View.VISIBLE);
                 notSureBtn.setVisibility(View.VISIBLE);
                 askMediaLocationPermissions();
-
             }
         });
 
@@ -370,6 +376,7 @@ public class Scan extends AppCompatActivity {
         final StorageReference image = storageReference.child("pictures/" + user.getUid() + "/" + name);
 
         if (isCapture) {
+            uploadImageInListener = true;
             LocationRequest locationRequest = new LocationRequest()
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setInterval(2000)
@@ -391,14 +398,17 @@ public class Scan extends AppCompatActivity {
                             Location location = locationResult.getLastLocation();
                             imageLat = Double.toString(location.getLatitude());
                             imageLon = Double.toString(location.getLongitude());
+                            if(uploadImageInListener){
+                                putFile(imageLat, imageLon, contentUri, image, name);
+                            }
+                            uploadImageInListener = false;
                         }
                     },
                     Looper.myLooper());
+            Toast.makeText(this, imageLat + ", " + imageLon, Toast.LENGTH_SHORT).show();
         }
         else if (!isCapture){
 
-            InputStream stream;
-            String picturePath;
 
 //            if(android.os.Build.VERSION.SDK_INT >= 29){
 //                //this.grantUriPermission(getPackageName() , contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -424,25 +434,128 @@ public class Scan extends AppCompatActivity {
 //                    fnfe.printStackTrace();
 //                }
 //            }
-            if (1 == 1){
-                picturePath = getPath( getApplicationContext(), contentUri );
-                try {
-                    ExifInterface exifInterface = new ExifInterface(picturePath);
-                    float[] latLong = new float[2];
-                    exifInterface.getLatLong(latLong);
-                    imageLat = Float.toString(latLong[0]);
-                    imageLon = Float.toString(latLong[1]);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(Scan.this, picturePath, Toast.LENGTH_SHORT).show();
+            final AlertDialog.Builder uploadDialog = new AlertDialog.Builder(this);
+            uploadDialog.setTitle("What would you like to use to geolocate the image?");
+            uploadDialog.setItems(R.array.geo_options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if(which == 0){
+                        uploadImageInListener = true;
+                        LocationRequest locationRequest = new LocationRequest()
+                                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                                .setInterval(2000)
+                                .setFastestInterval(1000);
+
+                        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                                    @Override
+                                    public void onLocationResult(LocationResult locationResult) {
+                                        Location location = locationResult.getLastLocation();
+                                        imageLat = Double.toString(location.getLatitude());
+                                        imageLon = Double.toString(location.getLongitude());
+                                        if(uploadImageInListener){
+                                            putFile(imageLat, imageLon, contentUri, image, name);
+                                        }
+                                        uploadImageInListener = false;
+                                    }
+                                },
+                                Looper.myLooper());
+                    }
+                    else{
+                        String picturePath;
+                        picturePath = getPath( getApplicationContext(), contentUri );
+                        try {
+                            ExifInterface exifInterface = new ExifInterface(picturePath);
+                            float[] latLong = new float[2];
+                            exifInterface.getLatLong(latLong);
+                            imageLat = Float.toString(latLong[0]);
+                            imageLon = Float.toString(latLong[1]);
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(Scan.this, picturePath, Toast.LENGTH_SHORT).show();
+                        }
+                        putFile(imageLat, imageLon, contentUri, image, name);
+                    }
                 }
-            }
+            });
+
+
+            uploadDialog.create().show();
+
+//            if (1 == 1){
+//                picturePath = getPath( getApplicationContext(), contentUri );
+//                try {
+//                    ExifInterface exifInterface = new ExifInterface(picturePath);
+//                    float[] latLong = new float[2];
+//                    exifInterface.getLatLong(latLong);
+//                    imageLat = Float.toString(latLong[0]);
+//                    imageLon = Float.toString(latLong[1]);
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Toast.makeText(Scan.this, picturePath, Toast.LENGTH_SHORT).show();
+//                }
+//            }
 
         }
 
+//        image.putFile(contentUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//            @Override
+//            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                if(imageLat == null || imageLon == null){
+//                    Toast.makeText(Scan.this, "Picture not uploaded, error fetching GPS coordinates.", Toast.LENGTH_SHORT).show();
+//                    image.delete();
+//                    onBackPressed();
+//                    return;
+//                }
+//                else if (imageLat.compareTo("0.0") == 0 && imageLon.compareTo("0.0") == 0){
+//                    Toast.makeText(Scan.this, "Picture not uploaded, image has no GPS coordinates.", Toast.LENGTH_SHORT).show();
+//                    image.delete();
+//                    onBackPressed();
+//                    return;
+//                }
+//
+//                final boolean[] uploadFinished = {false};
+//
+//                image.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                    @Override
+//                    public void onSuccess(Uri uri) {
+//                        Log.d("tag", "onSuccess: Uploaded Image URl is " + uri.toString());
+//                        uploadFinished[0] = true;
+//                    }
+//                });
+//
+////                while(!uploadFinished[0]){
+////                    Log.d("tag", "waiting for upload...");
+////                }
+//
+//                databaseReference = FirebaseDatabase.getInstance().getReference();
+//
+//                String databaseName = name.replace('.', '-');
+//
+//                String storageTimeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+//                imageDate = storageTimeStamp.substring(0, 10);
+//                imageTime = storageTimeStamp.substring(11, 19);
+//
+//                databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("Date").setValue(imageDate);
+//                databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("Time").setValue(imageTime);
+//                databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("gpsLng").setValue(imageLon);
+//                databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("gpsLat").setValue(imageLat);
+//                databaseReference.child("Pins").child(user.getUid()).child(databaseName).child("Status").setValue(imageStatus);
+//
+//                Toast.makeText(Scan.this, "Upload Successful!", Toast.LENGTH_SHORT).show();
+//                onBackPressed();
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Toast.makeText(Scan.this, "Upload Failed.", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+    }
 
-
+    public void putFile(String imageLat, String imageLon, Uri contentUri, StorageReference image, String name){
         image.putFile(contentUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -496,7 +609,6 @@ public class Scan extends AppCompatActivity {
                 Toast.makeText(Scan.this, "Upload Failed.", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
 
@@ -528,16 +640,17 @@ public class Scan extends AppCompatActivity {
 
 
     private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+        File photoFile = null;
         // Ensure that there's a camera activity to handle the intent
-         Toast.makeText(Scan.this, "TEST dispatchTakePictureIntent ", Toast.LENGTH_SHORT).show();
+//         Toast.makeText(Scan.this, "TEST dispatchTakePictureIntent ", Toast.LENGTH_SHORT).show();
 
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 
             // Create the File where the photo should go
-            File photoFile = null;
             try {
             //  Toast.makeText(Scan.this, "TEST IF null Camera", Toast.LENGTH_SHORT).show();
+                File dir = Environment.getExternalStorageDirectory();
 
                 photoFile = createImageFile();
             } catch (IOException ex) {
@@ -570,8 +683,15 @@ public class Scan extends AppCompatActivity {
     // Create a File for saving an image or video
     private static File getOutputMediaFile(int type){
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "ClusterScan");
+        File mediaStorageDir;
+
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.Q){
+            mediaStorageDir = Environment.getStorageDirectory();
+        }
+        else{
+            mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES), "ClusterScan");
+        }
 
         // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){
