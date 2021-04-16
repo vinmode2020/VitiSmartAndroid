@@ -26,9 +26,12 @@
 
     <TextView
         android:id="@+id/stepDesc"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Take a picture of the grape cluster."
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="Obtain a picture of the grape cluster.\n You can either take a picture right now (using &quot;capture&quot;) or upload one from your device's photo gallery (using &quot;gallery&quot;)."
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="#D2E41B"
         android:textColorHighlight="#FFFEFE"
@@ -42,7 +45,6 @@
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="24dp"
         android:background="@drawable/bg_round"
@@ -52,16 +54,13 @@
         app:layout_constraintEnd_toStartOf="@+id/galleryBtn"
         app:layout_constraintHorizontal_bias="0.237"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/camera_preview"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/galleryBtn"
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="24dp"
         android:background="@drawable/bg_round"
@@ -70,25 +69,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.765"
-        app:layout_constraintStart_toEndOf="@id/cameraBtn"
-        app:layout_constraintTop_toBottomOf="@+id/camera_preview"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <FrameLayout
-        android:id="@+id/camera_preview"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="80dp"
-        android:layout_weight="1"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stepDesc" />
+        app:layout_constraintStart_toEndOf="@id/cameraBtn" />
 
     <ImageView
         android:id="@+id/displayImageView"

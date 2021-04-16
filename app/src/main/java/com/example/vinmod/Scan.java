@@ -83,16 +83,12 @@ public class Scan extends AppCompatActivity {
     LocationManager locationManager;
     ImageView selectedImage;
     Button cameraBtn, galleryBtn;
-    String currentPhotoPath;
     StorageReference storageReference;
     Button infBtn, notSureBtn;
     Button notInfBtn;
     ProgressBar progressBar;
-    Camera mCamera;
-    CameraPreview mPreview;
     TextView stepCounter;
     TextView stepDescription;
-    File pictureFile;
     Uri contentUri;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -130,11 +126,6 @@ public class Scan extends AppCompatActivity {
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        mCamera = getCameraInstance();
-
-        mPreview = new CameraPreview(this, mCamera);
-        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-        preview.addView(mPreview);
 
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,14 +133,6 @@ public class Scan extends AppCompatActivity {
                 currentCode = CAMERA_REQUEST_CODE;
                 cameraBtn.setVisibility(View.INVISIBLE);
                 galleryBtn.setVisibility(View.INVISIBLE);
-                preview.setVisibility(View.INVISIBLE);
-                infBtn.setVisibility(View.VISIBLE);
-                notInfBtn.setVisibility(View.VISIBLE);
-                notSureBtn.setVisibility(View.VISIBLE);
-                selectedImage.setVisibility(View.VISIBLE);
-                stepCounter.setText("Step 2");
-                stepDescription.setText("Review the image and confirm its status.");
-//                mCamera.takePicture(null, null, mPicture);
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.Images.Media.TITLE, "New Picture");
                 contentValues.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
@@ -169,15 +152,7 @@ public class Scan extends AppCompatActivity {
                 startActivityForResult(gallery, GALLERY_REQUEST_CODE);
                 cameraBtn.setVisibility(View.INVISIBLE);
                 galleryBtn.setVisibility(View.INVISIBLE);
-                preview.setVisibility(View.INVISIBLE);
-                // Now make the three buttons visible
-                selectedImage.setVisibility(View.VISIBLE);
-                stepCounter.setText("Step 2");
-                stepDescription.setText("Review the image and confirm its status.");
-                infBtn.setVisibility(View.VISIBLE);
-                notInfBtn.setVisibility(View.VISIBLE);
-                notSureBtn.setVisibility(View.VISIBLE);
-                askMediaLocationPermissions();
+
             }
         });
 
@@ -316,6 +291,14 @@ public class Scan extends AppCompatActivity {
 
         }
 
+        // Now make the three buttons visible
+        selectedImage.setVisibility(View.VISIBLE);
+        stepCounter.setText("Step 2");
+        stepDescription.setText("Review the image and confirm its status.");
+        infBtn.setVisibility(View.VISIBLE);
+        notInfBtn.setVisibility(View.VISIBLE);
+        notSureBtn.setVisibility(View.VISIBLE);
+        askMediaLocationPermissions();
 
     }
 
@@ -464,51 +447,10 @@ public class Scan extends AppCompatActivity {
             }
         });
     }
-
-
-
     private String getFileExt(Uri contentUri) {
         ContentResolver c = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(c.getType(contentUri));
-    }
-
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-//    (If we don't want the picture to appear in the local gallery)    File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        // New folder called pictures
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    // Method for safely retrieving camera UI
-    public static Camera getCameraInstance(){
-        Camera c = null;
-        try {
-            c = Camera.open(); // attempt to get a Camera instance
-        }
-        catch (Exception e){
-            // Camera is not available (in use or does not exist)
-        }
-        return c; // returns null if camera is unavailable
-    }
-
-    @Override
-    public void onBackPressed() {
-        mCamera.stopPreview();
-        mCamera.release();
-        super.onBackPressed();
     }
 }
 
