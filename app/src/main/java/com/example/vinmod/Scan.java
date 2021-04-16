@@ -89,6 +89,7 @@ public class Scan extends AppCompatActivity {
     ProgressBar progressBar;
     TextView stepCounter;
     TextView stepDescription;
+    TextView beforeImage;
     Uri contentUri;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -117,9 +118,9 @@ public class Scan extends AppCompatActivity {
         notInfBtn = findViewById(R.id.notInfBtn);
         notSureBtn = findViewById(R.id.notSureBtn);
         progressBar = findViewById(R.id.contact_progressbar);
+        beforeImage = findViewById(R.id.before_image);
 
-        locationManager = (LocationManager)
-                getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         askCameraPermissions();
         askStoragePermissions();
@@ -131,8 +132,6 @@ public class Scan extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 currentCode = CAMERA_REQUEST_CODE;
-                cameraBtn.setVisibility(View.INVISIBLE);
-                galleryBtn.setVisibility(View.INVISIBLE);
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.Images.Media.TITLE, "New Picture");
                 contentValues.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
@@ -150,9 +149,6 @@ public class Scan extends AppCompatActivity {
                 currentCode = GALLERY_REQUEST_CODE;
                 Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(gallery, GALLERY_REQUEST_CODE);
-                cameraBtn.setVisibility(View.INVISIBLE);
-                galleryBtn.setVisibility(View.INVISIBLE);
-
             }
         });
 
@@ -189,6 +185,7 @@ public class Scan extends AppCompatActivity {
                 notSureBtn.setEnabled(false);
                 progressBar.setVisibility(View.VISIBLE);
                 String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                Log.d("RESULT", Integer.toString(currentCode));
                 if (currentCode == CAMERA_REQUEST_CODE) {
                     imageStatus = "false";
                     uploadImageToFirebase("IMG_"+ timeStamp + ".jpg", contentUri, true);
@@ -268,11 +265,11 @@ public class Scan extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         // Added a super call here to resolve the error
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("RESULT", Integer.toString(resultCode));
         if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
             try{
                 Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), contentUri);
                 selectedImage.setImageBitmap(imageBitmap);
-
             }catch(Exception ie){
                 ie.printStackTrace();
             }
@@ -291,14 +288,23 @@ public class Scan extends AppCompatActivity {
 
         }
 
-        // Now make the three buttons visible
-        selectedImage.setVisibility(View.VISIBLE);
-        stepCounter.setText("Step 2");
-        stepDescription.setText("Review the image and confirm its status.");
-        infBtn.setVisibility(View.VISIBLE);
-        notInfBtn.setVisibility(View.VISIBLE);
-        notSureBtn.setVisibility(View.VISIBLE);
-        askMediaLocationPermissions();
+        if(contentUri != null && resultCode == RESULT_OK){
+            // make imageview and decision buttons visible
+            cameraBtn.setVisibility(View.INVISIBLE);
+            galleryBtn.setVisibility(View.INVISIBLE);
+            beforeImage.setVisibility(View.INVISIBLE);
+            selectedImage.setVisibility(View.VISIBLE);
+            stepCounter.setText("Step 2");
+            stepDescription.setText("Review the image and confirm its status.");
+            infBtn.setVisibility(View.VISIBLE);
+            notInfBtn.setVisibility(View.VISIBLE);
+            notSureBtn.setVisibility(View.VISIBLE);
+            askMediaLocationPermissions();
+        }
+        else{
+            beforeImage.setText("No image selected!");
+        }
+
 
     }
 

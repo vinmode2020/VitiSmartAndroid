@@ -22,10 +22,8 @@
         android:background="@drawable/bg_round"
         android:backgroundTint="#4CAF50"
         android:text="Add A Reply"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/post_content"
-        app:layout_constraintVertical_bias="0.04" />
+        app:layout_constraintTop_toBottomOf="@+id/post_content" />
 
     <TextView
         android:id="@+id/post_title_details"
@@ -65,7 +63,9 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
-        android:background="#E1BE88"
+        android:background="@drawable/bg_round"
+        android:backgroundTint="#E1BE88"
+        android:foregroundTint="#E1BE88"
         android:scrollbarStyle="insideOverlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -117,6 +117,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.6"

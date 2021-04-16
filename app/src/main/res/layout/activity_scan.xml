@@ -148,5 +148,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/before_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="48dp"
+        android:background="@drawable/bg_round"
+        android:backgroundTint="#535151"
+        android:gravity="center"
+        android:text="Image will appear here"
+        app:layout_constraintBottom_toTopOf="@+id/notInfBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stepDesc" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

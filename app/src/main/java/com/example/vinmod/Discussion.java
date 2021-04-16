@@ -2,8 +2,11 @@ package com.example.vinmod;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +18,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -63,10 +68,10 @@ public class Discussion extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discussion);
 
-        Button newPost_Btn;
-
         newPost_Btn = findViewById(R.id.newPost_Btn);
         postList = findViewById(R.id.post_list);
+        int spacing = getResources().getDimensionPixelSize(R.dimen.nav_header_vertical_spacing);
+        postList.addItemDecoration(new SpacesItemDecoration(spacing));
 
         createSpinner();
 
@@ -77,11 +82,9 @@ public class Discussion extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Discussion.this, NewPost.class);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
-
-
     }
 
     ValueEventListener queryValueListener = new ValueEventListener() {
@@ -130,12 +133,22 @@ public class Discussion extends AppCompatActivity {
         postList.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1){
+            finish();
+            startActivity(getIntent());
+        }
+    }
+
     public class PostHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public final TextView postTitle;
         public final TextView postAuthor;
         public final TextView replyCount;
         public final TextView replyText;
         public final TextView deleteBtn;
+        public final ConstraintLayout postListItem;
 
         public Post post;
 
@@ -146,6 +159,7 @@ public class Discussion extends AppCompatActivity {
             replyCount = itemView.findViewById(R.id.reply_count);
             replyText = itemView.findViewById(R.id.textView8);
             deleteBtn = itemView.findViewById(R.id.delete_post);
+            postListItem = itemView.findViewById(R.id.postListItem);
 
             postTitle.setOnClickListener(this);
             postAuthor.setOnClickListener(this);
@@ -168,11 +182,13 @@ public class Discussion extends AppCompatActivity {
 
             replyText.setBackgroundColor(colors[colorCounter]);
 
+            postListItem.setBackgroundTintList(ColorStateList.valueOf(colors[colorCounter]));
+
             colorCounter++;
             if (colorCounter == 5) colorCounter = 0;
 
             if(user.getUid().compareTo(post.getAuthorId()) == 0) {
-                deleteBtn.setText(" X ");
+                deleteBtn.setText("  ×  ");
                 deleteBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -217,7 +233,7 @@ public class Discussion extends AppCompatActivity {
             bundle.putString("POST_CONTENT", post.getText());
             bundle.putString("REPLY_COUNT", String.valueOf(post.getReplyCount()));
             intent.putExtras(bundle);
-            startActivity(intent);
+            startActivityForResult(intent, 1);
         }
     }
 
@@ -285,4 +301,27 @@ public class Discussion extends AppCompatActivity {
         });
     }
 
+    private class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+        private int space;
+
+        public SpacesItemDecoration(int space) {
+            this.space = space;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view,
+                                   RecyclerView parent, RecyclerView.State state) {
+            outRect.left = space;
+            outRect.right = space;
+            outRect.bottom = space;
+
+            if (parent.getChildLayoutPosition(view) == 0) {
+                outRect.top = space;
+            } else {
+                outRect.top = 0;
+            }
+        }
+    }
+
 }
+
