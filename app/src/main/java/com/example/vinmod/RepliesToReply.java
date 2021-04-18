@@ -87,6 +87,13 @@ public class RepliesToReply extends AppCompatActivity {
         );
 
         databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl(extras.getString("REFERENCE"));
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
