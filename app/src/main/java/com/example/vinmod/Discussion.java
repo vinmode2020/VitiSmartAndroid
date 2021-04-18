@@ -273,6 +273,9 @@ public class Discussion extends AppCompatActivity {
             bundle.putString("POST_TITLE", post.getTitle());
             bundle.putString("POST_CONTENT", post.getText());
             bundle.putString("REPLY_COUNT", String.valueOf(post.getReplyCount()));
+            if(post.getAuthorId() != ""){
+                bundle.putString("AUTHOR_ID", post.getAuthorId());
+            }
             intent.putExtras(bundle);
             startActivityForResult(intent, 1);
         }

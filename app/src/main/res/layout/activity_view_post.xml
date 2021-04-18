@@ -29,6 +29,7 @@
         android:id="@+id/post_title_details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="Post Title"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="#D2E41B"
@@ -58,7 +59,7 @@
 
     <ScrollView
         android:id="@+id/post_content"
-        android:layout_width="0dp"
+        android:layout_width="362dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
@@ -72,41 +73,56 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/post_title_details">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/post_header"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:fontFamily="sans-serif-light"
+
                 android:text="On date, user wrote: \n"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-
                 android:textColor="#000000"
                 android:textColorHighlight="#FFFEFE"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/edit_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/post_text"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+
+                android:layout_marginBottom="8dp"
                 android:fontFamily="sans-serif-light"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-
                 android:textColor="#000000"
                 android:textColorHighlight="#FFFEFE"
-                android:textSize="14sp" />
-        </LinearLayout>
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/post_header" />
+
+            <ImageView
+                android:id="@+id/edit_button"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_edit_pencil_foreground" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
 

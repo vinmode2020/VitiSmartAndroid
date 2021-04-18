@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +69,7 @@ public class ViewPost extends AppCompatActivity implements Serializable {
     TextView replyHeader;
 
     Button addReplyButton;
+    ImageView editButton;
 
     Post post;
 
@@ -85,7 +87,7 @@ public class ViewPost extends AppCompatActivity implements Serializable {
                 extras.getString("POST_CONTENT"),
                 extras.getString("POST_AUTHOR"),
                 Integer.parseInt(extras.getString("REPLY_COUNT")),
-                ""
+                extras.getString("AUTHOR_ID")
         );
 
         postTitle = findViewById(R.id.post_title_details);
@@ -94,6 +96,7 @@ public class ViewPost extends AppCompatActivity implements Serializable {
         replyHeader = findViewById(R.id.replies_header);
         addReplyButton = findViewById(R.id.add_reply_button);
         replyList = findViewById(R.id.reply_list);
+        editButton = findViewById(R.id.edit_button);
 
         int spacing = getResources().getDimensionPixelSize(R.dimen.nav_header_vertical_spacing);
         replyList.addItemDecoration(new SpacesItemDecoration(spacing));
@@ -109,6 +112,68 @@ public class ViewPost extends AppCompatActivity implements Serializable {
             replyHeader.setText(post.getReplyCount() + " Reply");
         }
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if(post.getAuthorId().compareTo(user.getUid()) != 0){
+            editButton.setVisibility(View.INVISIBLE);
+        }
+
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder editDialog = new AlertDialog.Builder(v.getContext());
+                EditText editTitle = new EditText(v.getContext());
+                EditText editBody = new EditText(v.getContext());
+                TextView editTitleText = new TextView(v.getContext());
+                editTitleText.setText("\nTitle:");
+                TextView editBodyText = new TextView(v.getContext());
+                editBodyText.setText("\nBody:");
+
+                LinearLayout ll = new LinearLayout(v.getContext());
+                ll.setOrientation(LinearLayout.VERTICAL);
+                ll.addView(editTitleText);
+                ll.addView(editTitle);
+                ll.addView(editBodyText);
+                ll.addView(editBody);
+
+                editTitle.setText(post.getTitle());
+                editBody.setText(post.getText());
+
+                editDialog.setTitle("Edit Post");
+                editDialog.setView(ll);
+
+                editDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        databaseReference = FirebaseDatabase.getInstance().getReference();
+                        String newTitle = editTitle.getText().toString();
+                        String newBody = editBody.getText().toString();
+                        if(newTitle.length() > 0 && newBody.length() > 0){
+                            databaseReference.child("posts").child(post.getId()).child("title").setValue(newTitle);
+                            databaseReference.child("posts").child(post.getId()).child("text").setValue(newBody);
+                            Toast.makeText(ViewPost.this, "Edit complete.", Toast.LENGTH_SHORT).show();
+                            postTitle.setText(newTitle);
+                            postContent.setText(newBody);
+                        }
+                        else if(newBody.length() == 0){
+                            editBody.setError("Body cannot be blank");
+                        }
+                        else{
+                            editTitle.setError("Title cannot be blank");
+                        }
+                    }
+                });
+
+                editDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // close
+                    }
+                });
+
+                editDialog.create().show();
+            }
+        });
 
         addReplyButton.setOnClickListener(new View.OnClickListener() {
             @Override
