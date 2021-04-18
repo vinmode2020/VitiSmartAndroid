@@ -31,6 +31,9 @@
         <activity android:name=".AboutUs"
             android:configChanges="orientation"
             android:screenOrientation="portrait"/>
+        <activity android:name=".RepliesToReply"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity android:name=".MapImage"
             android:configChanges="orientation"
             android:screenOrientation="portrait"/>

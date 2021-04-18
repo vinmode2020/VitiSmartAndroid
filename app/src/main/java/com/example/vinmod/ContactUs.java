@@ -100,7 +100,7 @@ public class ContactUs extends AppCompatActivity {
 
     private class EmailThread extends Thread{
         public void run() {
-            GMailSender gMailSender = new GMailSender("vinmode2020@gmail.com", "pennstate2020", etSubject.getText().toString(), etMessage.getText().toString());
+            GMailSender gMailSender = new GMailSender("VitiSmartSender@gmail.com", "wnxnznupbcoccggu", etSubject.getText().toString(), etMessage.getText().toString());
             gMailSender.sendMail();
             emailThreadComplete = true;
         }

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,7 +41,8 @@ import java.util.Iterator;
 
 public class Discussion extends AppCompatActivity {
 
-    Button newPost_Btn;
+    Button newPostBtn;
+    Button searchButton;
     RecyclerView postList;
     Spinner sortOptions;
 
@@ -68,7 +70,8 @@ public class Discussion extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discussion);
 
-        newPost_Btn = findViewById(R.id.newPost_Btn);
+        newPostBtn = findViewById(R.id.newPost_Btn);
+        searchButton = findViewById(R.id.search_btn);
         postList = findViewById(R.id.post_list);
         int spacing = getResources().getDimensionPixelSize(R.dimen.nav_header_vertical_spacing);
         postList.addItemDecoration(new SpacesItemDecoration(spacing));
@@ -78,11 +81,51 @@ public class Discussion extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         // Listener for "new post" button
-        newPost_Btn.setOnClickListener(new View.OnClickListener() {
+        newPostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Discussion.this, NewPost.class);
                 startActivityForResult(intent, 1);
+            }
+        });
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText search = new EditText(v.getContext());
+
+                final AlertDialog.Builder searchDialog = new AlertDialog.Builder(v.getContext());
+                searchDialog.setTitle("New Search");
+                searchDialog.setMessage("Enter Search Key...");
+                searchDialog.setView(search);
+
+                searchDialog.setPositiveButton("Search", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ArrayList<Post> filteredPosts = new ArrayList<>();
+                        if (search.getText().length() > 0){
+                            for (Post x:discussionPosts
+                                 ) {
+                                if(x.getTitle().toLowerCase().contains(search.getText().toString().toLowerCase()) || x.getText().toLowerCase().contains(search.getText().toString().toLowerCase())){
+                                    filteredPosts.add(x);
+                                    Log.d("SEARCH", x.toString());
+                                }
+                            }
+                            adapter = new PostAdapter(filteredPosts);
+                            postList.setAdapter(adapter);
+                            Log.d("SEARCH", filteredPosts.toString());
+                        }
+                    }
+                });
+                searchDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+
+                    }
+                });
+
+                searchDialog.create().show();
             }
         });
     }
@@ -165,8 +208,6 @@ public class Discussion extends AppCompatActivity {
             postAuthor.setOnClickListener(this);
             replyCount.setOnClickListener(this);
             replyText.setOnClickListener(this);
-
-
         }
 
         public void bind(Post currentPost){
@@ -241,7 +282,7 @@ public class Discussion extends AppCompatActivity {
         private ArrayList<Post> postArrayList;
 
         public PostAdapter(ArrayList<Post> x){
-            postArrayList = discussionPosts;
+            postArrayList = x;
         }
 
         @NonNull

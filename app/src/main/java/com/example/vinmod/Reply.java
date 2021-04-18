@@ -5,12 +5,22 @@ public class Reply {
     private String date;
     private String user;
     private String message;
+    private String replyCount;
 
     public Reply(String w, String x, String y, String z){
         this.id = w;
         this.date = x;
         this.user = y;
         this.message = z;
+        this.replyCount = "0";
+    }
+
+    public Reply(String w, String x, String y, String z, String r){
+        this.id = w;
+        this.date = x;
+        this.user = y;
+        this.message = z;
+        this.replyCount = r;
     }
 
     public String getId() {
@@ -43,5 +53,13 @@ public class Reply {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getReplyCount() {
+        return replyCount;
+    }
+
+    public void setReplyCount(String replyCount) {
+        this.replyCount = replyCount;
     }
 }

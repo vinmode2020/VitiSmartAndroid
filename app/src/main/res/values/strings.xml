@@ -4,6 +4,9 @@
     <string name="infestationHeatmap">Your Infestation Heat Map</string>
     <string name="infestationMorePinInfo">Click on each pin to reveal more information.</string>
     <string name="heatMapConfirmBtn">Confirm Dates</string>
+    <string name="posterLink"><a href="https%3A%2F%2Fcapstonedesign.org%2FCapstoneWorks%2FPublic%2FPSU%2FBD%2FCSSE%2FClass2021%2FPresentationPPT%2FPSU-BD-CSSE-Class2021-Sec-001-Team-014-11.pdf%3FautoCounter%3D1618754758603%26option%3Dopen">More About the Project</a></string>
+    <string name="projDesc">This app for GBM infestation monitoring was developed by Penn State Behrend CS/SE Senior Design Team 14, under the guidance of Jonathan Liaw and to the specifications provided by Dr. Flor E. Acevedo.</string>
+
 
     <string name="tab1info">Grape berry moth larvae are easily detected early in the season by the presence of webs in young grape clusters. The larvae live inside the webs and feed on developing berries.</string>
     <string name="tab1titlee">Webbing in grape berry moth infested clusters early in the growing season</string>

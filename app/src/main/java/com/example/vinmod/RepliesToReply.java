@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -35,7 +35,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,16 +42,17 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.UUID;
 
-public class ViewPost extends AppCompatActivity implements Serializable {
+public class RepliesToReply extends AppCompatActivity {
 
-    private FirebaseDatabase database = FirebaseDatabase.getInstance();
-    private DatabaseReference databaseReference;
-    private FirebaseUser user;
-
+    Reply rootReply;
     RecyclerView replyList;
-    ReplyAdapter adapter;
+    Button backButton;
+
+    private FirebaseUser user;
+    private DatabaseReference databaseReference;
 
     private ArrayList<Reply> postReplies;
+    private ReplyAdapter adapter;
 
     int colorCounter = 0;
 
@@ -62,113 +62,31 @@ public class ViewPost extends AppCompatActivity implements Serializable {
             Color.argb(255, 240, 228, 66),
             Color.argb(255, 204, 121, 167)};
 
-    TextView postTitle;
-    TextView postHeader;
-    TextView postContent;
-    TextView replyHeader;
 
-    Button addReplyButton;
-
-    Post post;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_post);
+        setContentView(R.layout.activity_replies_to_reply);
 
-        Bundle extras = getIntent().getExtras();
-
-        post = new Post(
-                extras.getString("POST_ID"),
-                extras.getString("POST_DATE"),
-                extras.getString("POST_TITLE"),
-                extras.getString("POST_CONTENT"),
-                extras.getString("POST_AUTHOR"),
-                Integer.parseInt(extras.getString("REPLY_COUNT")),
-                ""
-        );
-
-        postTitle = findViewById(R.id.post_title_details);
-        postHeader = findViewById(R.id.post_header);
-        postContent = findViewById(R.id.post_text);
-        replyHeader = findViewById(R.id.replies_header);
-        addReplyButton = findViewById(R.id.add_reply_button);
-        replyList = findViewById(R.id.reply_list);
+        replyList = findViewById(R.id.reply_list2);
+        backButton = findViewById(R.id.back_button3);
 
         int spacing = getResources().getDimensionPixelSize(R.dimen.nav_header_vertical_spacing);
         replyList.addItemDecoration(new SpacesItemDecoration(spacing));
 
-        postTitle.setText(post.getTitle());
-        postHeader.setText("On " + post.getDate() + ", " + post.getUserName() + " wrote:\n");
-        postContent.setText(post.getText());
 
-        if(post.getReplyCount() != 1){
-            replyHeader.setText(post.getReplyCount() + " Replies");
-        }
-        else{
-            replyHeader.setText(post.getReplyCount() + " Reply");
-        }
+        Bundle extras = getIntent().getExtras();
 
+        rootReply = new Reply(
+                extras.getString("POST_ID"),
+                extras.getString("POST_DATE"),
+                extras.getString("POST_AUTHOR"),
+                extras.getString("POST_CONTENT"),
+                extras.getString("REPLY_COUNT")
+        );
 
-        addReplyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                final EditText reply = new EditText(v.getContext());
-
-                final AlertDialog.Builder addReplyDialog = new AlertDialog.Builder(v.getContext());
-                addReplyDialog.setTitle("New Reply");
-                addReplyDialog.setMessage("Write a reply...");
-                addReplyDialog.setView(reply);
-
-                addReplyDialog.setPositiveButton("Post", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm:ss");
-                        SimpleDateFormat dateSortable = new SimpleDateFormat("yyyyMMddHHmmss");
-
-                        String formatDate = date.format(new Date());
-                        String formatDateSortable = dateSortable.format(new Date());
-
-                        user = FirebaseAuth.getInstance().getCurrentUser();
-
-                        String screenName = user.getEmail().substring(0, user.getEmail().indexOf('@'));
-                        String replyId = UUID.randomUUID().toString().replace("-", "");
-
-                        databaseReference = FirebaseDatabase.getInstance().getReference();
-
-                        if(reply.getText().toString().isEmpty()){
-                            Toast.makeText(ViewPost.this, "Please write a reply before submitting.", Toast.LENGTH_SHORT).show();
-                        }
-                        else{
-                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId);
-                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("user").setValue(screenName);
-                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("date").setValue(formatDate);
-                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("dateSortable").setValue(formatDateSortable);
-                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("message").setValue(reply.getText().toString().trim());
-                            databaseReference.child("posts").child(post.getId()).child("replyCount").setValue(post.getReplyCount() + 1);
-                            databaseReference.child("posts").child(post.getId()).child("replies").child(replyId).child("replyCount").setValue(0);
-
-                            Toast.makeText(ViewPost.this, "Reply Successfully Added!", Toast.LENGTH_SHORT).show();
-                            getIntent().putExtra("REPLY_COUNT", String.valueOf(post.getReplyCount() + 1));
-                            finish();
-                            startActivity(getIntent());
-                        }
-
-                    }
-                });
-
-                addReplyDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // close
-                    }
-                });
-
-                addReplyDialog.create().show();
-
-            }
-        });
+        databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl(extras.getString("REFERENCE"));
     }
 
     @Override
@@ -176,8 +94,6 @@ public class ViewPost extends AppCompatActivity implements Serializable {
         super.onStart();
 
         postReplies = new ArrayList<Reply>();
-
-        databaseReference = database.getReference("/posts/" + post.getId() + "/replies");
 
         ValueEventListener queryValueListener = new ValueEventListener() {
 
@@ -187,7 +103,10 @@ public class ViewPost extends AppCompatActivity implements Serializable {
                 Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
                 Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
 
+                Log.d("CLICK", dataSnapshot.toString());
+
                 while (iterator.hasNext()) {
+                    Log.d("CLICK", "Hello");
                     DataSnapshot next = (DataSnapshot) iterator.next();
                     if(next.child("replyCount").exists()){
                         postReplies.add(new Reply(next.getKey().toString(), next.child("date").getValue().toString(), next.child("user").getValue().toString(), next.child("message").getValue().toString(), next.child("replyCount").getValue().toString()));
@@ -199,7 +118,7 @@ public class ViewPost extends AppCompatActivity implements Serializable {
 
                 Collections.reverse(postReplies);
 
-                adapter = new ViewPost.ReplyAdapter(postReplies);
+                adapter = new RepliesToReply.ReplyAdapter(postReplies);
 
                 replyList.setAdapter(adapter);
             }
@@ -210,16 +129,13 @@ public class ViewPost extends AppCompatActivity implements Serializable {
             }
         };
 
-
         Query query = databaseReference.orderByChild("dateSortable");
         query.addListenerForSingleValueEvent(queryValueListener);
-
-
 
         replyList.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    public class ReplyHolder extends RecyclerView.ViewHolder implements View.OnClickListener, Serializable {
+    public class ReplyHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public final TextView replyHeader;
         public final TextView replyContent;
         public final ConstraintLayout constraintLayout;
@@ -253,7 +169,7 @@ public class ViewPost extends AppCompatActivity implements Serializable {
             if (Integer.parseInt(reply.getReplyCount()) > 0){
                 Log.d("REPLY", "In here...");
                 ConstraintSet set = new ConstraintSet();
-                TextView replyCountText = new TextView(ViewPost.this);
+                TextView replyCountText = new TextView(RepliesToReply.this);
                 replyCountText.setId(View.generateViewId());
                 constraintLayout.addView(replyCountText, 0);
 
@@ -289,20 +205,18 @@ public class ViewPost extends AppCompatActivity implements Serializable {
                             String screenName = user.getEmail().substring(0, user.getEmail().indexOf('@'));
                             String replyId = UUID.randomUUID().toString().replace("-", "");
 
-                            databaseReference = FirebaseDatabase.getInstance().getReference();
-
                             if(replyText.getText().toString().isEmpty()){
-                                Toast.makeText(ViewPost.this, "Please write a reply before submitting.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RepliesToReply.this, "Please write a reply before submitting.", Toast.LENGTH_SHORT).show();
                             }
                             else{
-                                databaseReference.child("posts").child(post.getId()).child("replies").child(reply.getId()).child("replies").child(replyId);
-                                databaseReference.child("posts").child(post.getId()).child("replies").child(reply.getId()).child("replies").child(replyId).child("user").setValue(screenName);
-                                databaseReference.child("posts").child(post.getId()).child("replies").child(reply.getId()).child("replies").child(replyId).child("date").setValue(formatDate);
-                                databaseReference.child("posts").child(post.getId()).child("replies").child(reply.getId()).child("replies").child(replyId).child("dateSortable").setValue(formatDateSortable);
-                                databaseReference.child("posts").child(post.getId()).child("replies").child(reply.getId()).child("replies").child(replyId).child("message").setValue(replyText.getText().toString().trim());
-                                databaseReference.child("posts").child(post.getId()).child("replies").child(reply.getId()).child("replyCount").setValue(Integer.parseInt(reply.getReplyCount()) + 1);
+                                databaseReference.child(reply.getId()).child("replies").child(replyId);
+                                databaseReference.child(reply.getId()).child("replies").child(replyId).child("user").setValue(screenName);
+                                databaseReference.child(reply.getId()).child("replies").child(replyId).child("date").setValue(formatDate);
+                                databaseReference.child(reply.getId()).child("replies").child(replyId).child("dateSortable").setValue(formatDateSortable);
+                                databaseReference.child(reply.getId()).child("replies").child(replyId).child("message").setValue(replyText.getText().toString().trim());
+                                databaseReference.child(reply.getId()).child("replyCount").setValue(Integer.parseInt(reply.getReplyCount()) + 1);
 
-                                Toast.makeText(ViewPost.this, "Reply Successfully Added!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RepliesToReply.this, "Reply Successfully Added!", Toast.LENGTH_SHORT).show();
                                 finish();
                                 startActivity(getIntent());
                             }
@@ -325,7 +239,7 @@ public class ViewPost extends AppCompatActivity implements Serializable {
             if(Integer.parseInt(reply.getReplyCount()) > 0){
                 DatabaseReference newReference = databaseReference.child(reply.getId()).child("replies");
                 Log.d("CLICK", newReference.toString());
-                Intent intent = new Intent(ViewPost.this, RepliesToReply.class);
+                Intent intent = new Intent(RepliesToReply.this, RepliesToReply.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("POST_ID", reply.getId());
                 bundle.putString("POST_DATE", reply.getDate());
@@ -341,7 +255,7 @@ public class ViewPost extends AppCompatActivity implements Serializable {
 
 
 
-    public class ReplyAdapter extends RecyclerView.Adapter<ViewPost.ReplyHolder> {
+    public class ReplyAdapter extends RecyclerView.Adapter<RepliesToReply.ReplyHolder> {
 
         private ArrayList<Reply> replyArrayList;
 
@@ -352,14 +266,14 @@ public class ViewPost extends AppCompatActivity implements Serializable {
 
         @NonNull
         @Override
-        public ViewPost.ReplyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public RepliesToReply.ReplyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_reply, parent, false);
 
-            return new ViewPost.ReplyHolder(view);
+            return new RepliesToReply.ReplyHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ViewPost.ReplyHolder holder, int position) {
+        public void onBindViewHolder(@NonNull RepliesToReply.ReplyHolder holder, int position) {
             Reply nextReply = replyArrayList.get(position);
             holder.bind(nextReply);
         }
