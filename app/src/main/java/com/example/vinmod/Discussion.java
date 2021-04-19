@@ -1,10 +1,14 @@
 package com.example.vinmod;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,10 +38,27 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 public class Discussion extends AppCompatActivity {
 
@@ -49,8 +70,11 @@ public class Discussion extends AppCompatActivity {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference dbRef = database.getReference("/posts");
     FirebaseUser user;
+    FirebaseFirestore fStore;
 
     Boolean isDescending = true;
+    Boolean isModerator = false;
+    Boolean emailThreadComplete = false;
 
     PostAdapter adapter;
 
@@ -79,6 +103,20 @@ public class Discussion extends AppCompatActivity {
         createSpinner();
 
         user = FirebaseAuth.getInstance().getCurrentUser();
+
+        fStore = FirebaseFirestore.getInstance();
+        DocumentReference documentReference = fStore.collection("users").document(user.getUid());
+
+        documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if(documentSnapshot.get("moderator") != null){
+                    isModerator = true;
+                }else {
+                    Log.d("DOC_SNAPSHOT", "onEvent: Document does not exist");
+                }
+            }
+        });
 
         // Listener for "new post" button
         newPostBtn.setOnClickListener(new View.OnClickListener() {
@@ -228,32 +266,74 @@ public class Discussion extends AppCompatActivity {
             colorCounter++;
             if (colorCounter == 5) colorCounter = 0;
 
-            if(user.getUid().compareTo(post.getAuthorId()) == 0) {
+            if(user.getUid().compareTo(post.getAuthorId()) == 0 || isModerator) {
                 deleteBtn.setText("  ×  ");
                 deleteBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         final AlertDialog.Builder removePostDialog = new AlertDialog.Builder(v.getContext());
                         removePostDialog.setTitle("Delete Post");
-                        removePostDialog.setMessage("Are you sure you want to delete this post?");
 
-                        removePostDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dbRef.child(post.getId()).removeValue();
-                                Toast.makeText(Discussion.this, "Post successfully deleted!", Toast.LENGTH_SHORT).show();
-                                finish();
-                                startActivity(getIntent());
-                            }
-                        });
+                        if(user.getUid().compareTo(post.getAuthorId()) == 0){
+                            removePostDialog.setMessage("Are you sure you want to delete this post?");
 
-                        removePostDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // close
-                            }
-                        });
+                            removePostDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dbRef.child(post.getId()).removeValue();
+                                    Toast.makeText(Discussion.this, "Post successfully deleted!", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    startActivity(getIntent());
+                                }
+                            });
 
+                            removePostDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // close
+                                }
+                            });
+                        }
+                        else{
+                            EditText reasonText = new EditText(Discussion.this);
+                            removePostDialog.setMessage("Supply a reason for removing the post: ");
+                            removePostDialog.setView(reasonText);
+
+                            removePostDialog.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if(reasonText.getText().length() > 0){
+                                        if(isOnline()){
+                                            DocumentReference documentReference = fStore.collection("users").document(post.getAuthorId());
+                                            documentReference.addSnapshotListener(Discussion.this, new EventListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                                    String userEmail = documentSnapshot.get("email").toString();
+                                                    EmailThread emailThread = new EmailThread(userEmail, post.getTitle(), reasonText.getText().toString());
+                                                    emailThread.start();
+                                                    while(!emailThreadComplete){
+                                                        Log.d("AUTH", "Stuck in here...");
+                                                    }
+                                                    dbRef.child(post.getId()).removeValue();
+                                                    Toast.makeText(Discussion.this, "Post removed.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        }
+                                        else{
+                                            Toast.makeText(Discussion.this, "Delete Message failed to send, make sure you have a reliable internet connection.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                    finish();
+                                    startActivity(getIntent());
+                                }
+                            });
+                            removePostDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //close
+                                }
+                            });
+                        }
                         removePostDialog.create().show();
                     }
                 });
@@ -281,6 +361,24 @@ public class Discussion extends AppCompatActivity {
         }
     }
 
+    private class EmailThread extends Thread{
+        private String recipient;
+        private String postName;
+        private String reason;
+
+        public void run() {
+            GMailSender gMailSender = new GMailSender("VitiSmartSender@gmail.com", "wnxnznupbcoccggu", recipient, postName, reason);
+            gMailSender.sendMail();
+            emailThreadComplete = true;
+        }
+
+        public EmailThread(String w, String x, String y){
+            this.recipient = w;
+            this.postName = x;
+            this.reason = y;
+        }
+    }
+
     public class PostAdapter extends RecyclerView.Adapter<PostHolder> {
         private ArrayList<Post> postArrayList;
 
@@ -304,6 +402,64 @@ public class Discussion extends AppCompatActivity {
         @Override
         public int getItemCount() {
             return postArrayList.size();
+        }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+            return true;
+        }
+        return false;
+    }
+
+    public class GMailSender extends javax.mail.Authenticator{
+        private Session session;
+        private String user;
+        private String pword;
+        private String recipient;
+        private String postName;
+        private String reason;
+
+        public GMailSender(String user, String password, String recEmail, String postName, String reason){
+            this.user = user;
+            this.pword = password;
+            this.recipient = recEmail;
+            this.postName = postName;
+            this.reason = reason;
+        }
+
+        protected PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(user, pword);
+        }
+
+        public synchronized void sendMail(){
+            try{
+                Properties properties = new Properties();
+                properties.setProperty("mail.transport.protocol", "smtp");
+                properties.put("mail.smtp.auth", "true");
+                properties.put("mail.smtp.starttls.enable", "true");
+                properties.put("mail.smtp.host", "smtp.gmail.com");
+                properties.put("mail.smtp.socketFactory.class",
+                        "javax.net.ssl.SSLSocketFactory");
+                properties.put("mail.smtp.port", "465");
+                properties.put("mail.smtp.socketFactory.port", "465");
+
+                session = Session.getDefaultInstance(properties, this);
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(user));
+                message.setRecipients(Message.RecipientType.TO,
+                        InternetAddress.parse(recipient));
+                message.setSubject("VitiSmart: Post Removal Notice ");
+                message.setText("Hi " + recipient.substring(0, recipient.indexOf('@')) + ",\n\n" + "Your post entitled \"" + postName + "\" has been removed from the forum for the following reason:\n\n" +
+                        reason + "\n\nIf you think this was done in error or if you have any questions, please reach out to vinmode2020@gmail.com with your concern or use the \"Contact Us\" tool within the app." +
+                        "\n\nThanks,\nThe VitiSmart Team");
+                Transport.send(message);
+            } catch(MessagingException me){
+                me.printStackTrace();
+            }
         }
     }
 

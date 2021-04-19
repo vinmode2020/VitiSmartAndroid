@@ -178,7 +178,7 @@ public class ContactUs extends AppCompatActivity {
         return false;
     }
 
-    private class GMailSender extends javax.mail.Authenticator{
+    public class GMailSender extends javax.mail.Authenticator{
         private Session session;
         private String user;
         private String pword;
