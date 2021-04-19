@@ -43,9 +43,10 @@
 
     <Button
         android:id="@+id/bt_send"
-        android:layout_width="145dp"
-        android:layout_height="64dp"
-        android:layout_marginBottom="24dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="28dp"
         android:background="@drawable/new_btn1"
         android:backgroundTint="@color/purple_700"
         android:padding="10dp"
@@ -54,7 +55,24 @@
         android:textColorHint="@color/black"
         android:textSize="25dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/bt_moderator"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/bt_moderator"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="28dp"
+        android:background="@drawable/new_btn1"
+        android:backgroundTint="@color/purple_700"
+        android:padding="10dp"
+        android:text="I want to be a moderator"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/bt_send" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
