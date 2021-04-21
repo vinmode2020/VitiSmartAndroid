@@ -49,20 +49,22 @@
 
     <Button
         android:id="@+id/heatMapConfirmDateButton"
-        android:layout_width="85dp"
-        android:layout_height="70dp"
-        android:layout_marginStart="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginTop="25dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/bg_round"
         android:backgroundTint="#4CAF50"
         android:text="@string/heatMapConfirmBtn"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        app:layout_constraintStart_toEndOf="@+id/startYearSpinner"
+        app:layout_constraintBottom_toTopOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/morePinInfo" />
 
     <TextView
         android:id="@+id/startDate"
-        android:layout_width="80dp"
+        android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="25dp"
@@ -78,29 +80,6 @@
         app:layout_constraintTop_toBottomOf="@+id/morePinInfo"
         tools:ignore="MissingConstraints" />
 
-    <Spinner
-        android:id="@+id/startMonthSpinner"
-        android:layout_width="50dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="25dp"
-        android:background="@drawable/bg_round"
-        android:backgroundTint="#C2BCBC"
-        app:layout_constraintStart_toEndOf="@+id/startDate"
-        app:layout_constraintTop_toBottomOf="@+id/morePinInfo"
-        tools:ignore="MissingConstraints" />
-
-    <Spinner
-        android:id="@+id/startYearSpinner"
-        android:layout_width="85dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="25dp"
-        android:background="@drawable/bg_round"
-        android:backgroundTint="#C2BCBC"
-        app:layout_constraintStart_toEndOf="@+id/startDaySpinner"
-        app:layout_constraintTop_toBottomOf="@+id/morePinInfo"
-        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/endDate"
@@ -117,53 +96,6 @@
         app:layout_constraintTop_toBottomOf="@+id/startDate"
         tools:ignore="MissingConstraints" />
 
-    <Spinner
-        android:id="@+id/endMonthSpinner"
-        android:layout_width="50dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_round"
-        android:backgroundTint="#C2BCBC"
-        app:layout_constraintStart_toEndOf="@+id/endDate"
-        app:layout_constraintTop_toBottomOf="@+id/startMonthSpinner"
-        tools:ignore="MissingConstraints" />
-
-    <Spinner
-        android:id="@+id/endYearSpinner"
-        android:layout_width="85dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_round"
-        android:backgroundTint="#C2BCBC"
-        app:layout_constraintStart_toEndOf="@+id/endDaySpinner"
-        app:layout_constraintTop_toBottomOf="@+id/startYearSpinner"
-        tools:ignore="MissingConstraints" />
-
-    <Spinner
-        android:id="@+id/startDaySpinner"
-        android:layout_width="50dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="25dp"
-        android:background="@drawable/bg_round"
-        android:backgroundTint="#C2BCBC"
-        app:layout_constraintStart_toEndOf="@+id/startMonthSpinner"
-        app:layout_constraintTop_toBottomOf="@+id/morePinInfo"
-        tools:ignore="MissingConstraints" />
-
-    <Spinner
-        android:id="@+id/endDaySpinner"
-        android:layout_width="50dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_round"
-        android:backgroundTint="#C2BCBC"
-        app:layout_constraintStart_toEndOf="@+id/endMonthSpinner"
-        app:layout_constraintTop_toBottomOf="@+id/startDaySpinner"
-        tools:ignore="MissingConstraints" />
 
     <fragment
         android:id="@+id/map"
@@ -172,21 +104,54 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
 
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         app:cameraZoom="10"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
 
-        app:layout_constraintTop_toBottomOf="@+id/endYearSpinner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pick_enddate"
         app:mapType="terrain"
         app:uiCompass="true"
         app:uiRotateGestures="true"
         app:uiZoomControls="true"
         tools:context=".MainActivity" />
+
+    <Button
+        android:id="@+id/pick_startdate"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_round"
+        android:gravity="left|center_vertical"
+        android:paddingLeft="8dp"
+        android:text="Pick a date..."
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        app:layout_constraintEnd_toStartOf="@+id/heatMapConfirmDateButton"
+        app:layout_constraintStart_toEndOf="@+id/startDate"
+        app:layout_constraintTop_toBottomOf="@+id/morePinInfo" />
+
+    <Button
+        android:id="@+id/pick_enddate"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_round"
+        android:gravity="left|center_vertical"
+        android:paddingLeft="8dp"
+        android:text="Pick a date..."
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        app:layout_constraintEnd_toStartOf="@+id/heatMapConfirmDateButton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/startDate"
+        app:layout_constraintTop_toBottomOf="@+id/pick_startdate" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

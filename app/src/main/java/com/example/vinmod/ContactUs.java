@@ -223,7 +223,7 @@ public class ContactUs extends AppCompatActivity {
                     bodyPart1.setText("This user has made a request to be granted moderator status. Below are some key user details:\n" +
                             "   • Email address: " + fbaseUser.getEmail() + "\n" +
                             "   • UID: " + fbaseUser.getUid() + "\n\n" +
-                            "Currently, automatic granting of moderator status is not supported and must be done manually in Firebase. In order to complete this, login to firebase and navigate to the \"users\" collection in Firestore, locate the document named after this user's UID, create a new attribute \"moderator\" and give it a value of 1.\n\n" +
+                            "Currently, automatic granting of moderator status is not supported and must be done manually in Firebase. In order to complete this, login to firebase, navigate to https://console.firebase.google.com/project/vinmode-144a9/firestore/data~2Fusers~2F" + fbaseUser.getUid() + " and create a new attribute \"moderator\" and give it a value of 1.\n\n" +
                             "Open this link for a visual instruction: https://firebasestorage.googleapis.com/v0/b/vinmode-144a9.appspot.com/o/howtoscreenshot.PNG?alt=media&token=1615e5dd-7e52-4056-8dd5-92017e1a86bf");
                     Multipart multipart = new MimeMultipart();
                     multipart.addBodyPart(bodyPart1);

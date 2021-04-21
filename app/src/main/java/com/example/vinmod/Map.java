@@ -1,16 +1,18 @@
 package com.example.vinmod;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Spinner;
+import android.widget.DatePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,8 +20,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -50,6 +58,7 @@ import com.google.firebase.storage.StorageReference;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -69,20 +78,18 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     FirebaseFirestore fStore;
     Button confirmDateBtn;
+    static Button startDate, endDate;
 
+    LatLng startPoint;
+    boolean startPointSet = false;
 
-
-    //Spinners that are used to set parameters
-    private String startMonthSpinner;
-    private String startYearSpinner;
-    private String startDaySpinner;
-    private String endMonthSpinner;
-    private String endYearSpinner;
-    private String endDaySpinner;
 
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageReference = storage.getReference();
+
+    FusedLocationProviderClient fusedLocationProviderClient;
+
 
     //Array's used for pins
     ArrayList<Double> latArray = new ArrayList<>();
@@ -94,14 +101,14 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
     //Connecting to Firebase
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference adminRef;
     List<DocumentSnapshot> userList;
     ArrayList<String> uidList = new ArrayList<String>();
     DatabaseReference dbRef = database.getReference("/Pins/" + user.getUid());
+
     String currentUid = "";
     boolean uidThreadComplete = false;
-
     boolean isAdmin = false;
+    int startDateSortable, endDateSortable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,8 +116,12 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
         setContentView(R.layout.activity_map);
         confirmDateBtn = findViewById(R.id.heatMapConfirmDateButton); //Linking confirmDateBtn to respective Button in heat map page
+        startDate = findViewById(R.id.pick_startdate);
+        endDate = findViewById(R.id.pick_enddate);
 
         fStore = FirebaseFirestore.getInstance();
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         FirebaseFirestore.getInstance()
                 .collection("users")
@@ -143,41 +154,43 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
         });
 
         checkPermission(); //Checking permissions
-        createSpinners(); //Creating the spinners in our activity
         confirmDateBtnListener(); //For Querying the The database
-        
+
+        startDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment dialogFragment = new DatePickerFragment(true);
+                dialogFragment.show(getSupportFragmentManager(), "datePicker");
+            }
+        });
+        endDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment dialogFragment = new DatePickerFragment(false);
+                dialogFragment.show(getSupportFragmentManager(), "datePicker");
+            }
+        });
     }
 
 
     /**
-     * This method allows the user to set a start date for filtering in their heat map
+     * This method allows the user to set a date for filtering in their heat map
      *
      * @param day startDaySpinner
      * @param month startMonthSpinner
      * @param year startYearSpinner
      * @return startingDate
      */
-    private String createStartDate(String day, String month, String year){
-        String startingDate = year + "-" + month + "-" + day;
-        System.out.println(startingDate);
-        return startingDate;
+    private static String createStartDate(String day, String month, String year){
+        if(month.length() == 1){
+            month = "0" + month;
+        }
+        if(day.length() == 1){
+            day = "0" + day;
+        }
+        return year + "-" + month + "-" + day;
     }
 
-    /**
-     * This method allows the user to set an end date for filtering their heat map
-     *
-     * @param day endDaySpinner
-     * @param month endMonthSpinner
-     * @param year endYearSpinner
-     * @return endDate
-     */
-    private String createEndDate(String day, String month, String year){
-        String endDate = year + "-" + month + "-" + day;
-        System.out.println(endDate);
-        return endDate;
-    }
-
-   
     /**
      * This method is the Event handler for our confirmDateBtn
      */
@@ -188,77 +201,25 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                 latArray.clear(); lngArray.clear(); dateArray.clear(); timeArray.clear(); infestedArray.clear(); imageLinkArray.clear(); //Clearing all the Arrays
 
                 mMap.clear();
-                String startMonth, endMonth;
+                String startDateText = startDate.getText().toString();
+                String endDateText = endDate.getText().toString();
 
-                switch(startMonthSpinner){
-                    case "Jan":
-                        startMonth = "1";
-                    case "Feb":
-                        startMonth = "2";
-                    case "Mar":
-                        startMonth = "3";
-                    case "Apr":
-                        startMonth = "4";
-                    case "May":
-                        startMonth = "5";
-                    case "Jun":
-                        startMonth = "6";
-                    case "Jul":
-                        startMonth = "7";
-                    case "Aug":
-                        startMonth = "8";
-                    case "Sep":
-                        startMonth = "9";
-                    case "Oct":
-                        startMonth = "10";
-                    case "Nov":
-                        startMonth = "11";
-                    default:
-                        startMonth = "12";
-
+                if(startDateText.compareTo("Pick a date...") == 0 || endDateText.compareTo("Pick a date...") == 0){
+                    Toast.makeText(Map.this, "Please select both a start and an end date.", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
-                switch(endMonthSpinner){
-                    case "Jan":
-                        endMonth = "1";
-                    case "Feb":
-                        endMonth = "2";
-                    case "Mar":
-                        endMonth = "3";
-                    case "Apr":
-                        endMonth = "4";
-                    case "May":
-                        endMonth = "5";
-                    case "Jun":
-                        endMonth = "6";
-                    case "Jul":
-                        endMonth = "7";
-                    case "Aug":
-                        endMonth = "8";
-                    case "Sep":
-                        endMonth = "9";
-                    case "Oct":
-                        endMonth = "10";
-                    case "Nov":
-                        endMonth = "11";
-                    default:
-                        endMonth = "12";
-                }
-
-                double startDateSortable = Integer.parseInt(startYearSpinner + startMonth + startDaySpinner);
-                double endDateSortable = Integer.parseInt(endYearSpinner + endMonth + endDaySpinner);
+                startDateSortable = Integer.parseInt(startDateText.substring(0, 4) + startDateText.substring(5, 7) + startDateText.substring(8));
+                Log.d("DATES", Integer.toString(startDateSortable));
+                endDateSortable = Integer.parseInt(endDateText.substring(0, 4) + endDateText.substring(5, 7) + endDateText.substring(8));
+                Log.d("DATES", Integer.toString(endDateSortable));
 
                 if(startDateSortable > endDateSortable){
                     Toast.makeText(Map.this, "Start date must be before end date", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     if(!isAdmin){
-                        Query query = dbRef
-                                .orderByChild("Date")   //Sorting the pins by the date they were uploaded
-                                .startAt(createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner)) //Filtering the query to start at specified date
-                                .endAt(createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner));  //Filtering the query to end at the specified date
-
-
+                        Query query = dbRef;
                         query.addListenerForSingleValueEvent(valueEventListener);
                     }
                     else{
@@ -269,18 +230,14 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                         for(String x: uidList){
                             dbRef = database.getReference("/Pins/" + x);
                             currentUid = x;
-                            Query query = dbRef
-                                    .orderByChild("Date")
-                                    .startAt(createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner)) //Filtering the query to start at specified date
-                                    .endAt(createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner));  //Filtering the query to end at the specified date
+                            Query query = dbRef;
 
                             runAdminEventListener(query, x);
                         }
 
                     }
+                    Toast.makeText(Map.this, "Dates confirmed.", Toast.LENGTH_SHORT).show();
                 }
-
-                Toast.makeText(Map.this, "Dates confirmed.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -292,17 +249,19 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Log.d("Ugh", currentUid);
-                        imageLinkArray.add("pictures/" + uid + "/" + snapshot.getKey().replace("-", "."));
-                        latArray.add(Double.parseDouble(snapshot.child("gpsLat").getValue().toString()));
-                        lngArray.add(Double.parseDouble(snapshot.child("gpsLng").getValue().toString()));
-                        dateArray.add(snapshot.child("Date").getValue().toString());
-                        timeArray.add(snapshot.child("Time").getValue().toString());
-                        infestedArray.add(Boolean.parseBoolean(snapshot.child("Status").getValue().toString()));
+                        String date = snapshot.child("Date").getValue().toString();
+                        int sortableDate = Integer.parseInt(date.substring(0, 4) + date.substring(5, 7) + date.substring(8));
+                        if(sortableDate > startDateSortable && sortableDate < endDateSortable){
+                            imageLinkArray.add("pictures/" + uid + "/" + snapshot.getKey().replace("-", "."));
+                            latArray.add(Double.parseDouble(snapshot.child("gpsLat").getValue().toString()));
+                            lngArray.add(Double.parseDouble(snapshot.child("gpsLng").getValue().toString()));
+                            dateArray.add(snapshot.child("Date").getValue().toString());
+                            timeArray.add(snapshot.child("Time").getValue().toString());
+                            infestedArray.add(Boolean.parseBoolean(snapshot.child("Status").getValue().toString()));
+                        }
                     }
                     onMapReady(mMap); //Adding users pins to the map
-                    LatLng firstPin = new LatLng(latArray.get(0), lngArray.get(0)); //Setting a new LatLng Variable to update camera to first pin
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(firstPin)); //Updating the Camera position to first pin the user Query
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(startPoint));    //Setting the starting point to Erie, Pa
                 }
             }
 
@@ -322,17 +281,19 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
             if (dataSnapshot.exists()){
                 for (DataSnapshot snapshot : dataSnapshot.getChildren() ){
-                    imageLinkArray.add("pictures/" + user.getUid() + "/" + snapshot.getKey().replace("-", "."));
-                    latArray.add(Double.parseDouble(snapshot.child("gpsLat").getValue().toString()));
-                    lngArray.add(Double.parseDouble(snapshot.child("gpsLng").getValue().toString()));
-                    dateArray.add(snapshot.child("Date").getValue().toString());
-                    timeArray.add(snapshot.child("Time").getValue().toString());
-                    infestedArray.add(Boolean.parseBoolean(snapshot.child("Status").getValue().toString()));
+                    String date = snapshot.child("Date").getValue().toString();
+                    int sortableDate = Integer.parseInt(date.substring(0, 4) + date.substring(5, 7) + date.substring(8));
+                    if(sortableDate > startDateSortable && sortableDate < endDateSortable){
+                        imageLinkArray.add("pictures/" + user.getUid() + "/" + snapshot.getKey().replace("-", "."));
+                        latArray.add(Double.parseDouble(snapshot.child("gpsLat").getValue().toString()));
+                        lngArray.add(Double.parseDouble(snapshot.child("gpsLng").getValue().toString()));
+                        dateArray.add(snapshot.child("Date").getValue().toString());
+                        timeArray.add(snapshot.child("Time").getValue().toString());
+                        infestedArray.add(Boolean.parseBoolean(snapshot.child("Status").getValue().toString()));
+                    }
                 }
                 onMapReady(mMap); //Adding users pins to the map
-                LatLng firstPin = new LatLng(latArray.get(0), lngArray.get(0)); //Setting a new LatLng Variable to update camera to first pin
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(firstPin)); //Updating the Camera position to first pin the user Query
-
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(startPoint));    //Setting the starting point to Erie, Pa
             }
             //-----Delete when finished-----//
             for (int x = 0; x <infestedArray.size();x++){
@@ -348,145 +309,35 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
         }
     };
 
-    /**
-     * This method creates all of the spinners that will be used for our activity_map.xml
-     */
-    private void createSpinners(){
+    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener{
+        boolean isStartDate;
 
-        //Dropdown Menu
-        Spinner spinner1 = (Spinner) findViewById(R.id.startMonthSpinner);
-        Spinner spinner2 = (Spinner) findViewById(R.id.startYearSpinner);
-        Spinner spinner3 = (Spinner) findViewById(R.id.endMonthSpinner);
-        Spinner spinner4 = (Spinner) findViewById(R.id.endYearSpinner);
-        Spinner spinner5 = (Spinner) findViewById(R.id.startDaySpinner);
-        Spinner spinner6 = (Spinner) findViewById(R.id.endDaySpinner);
-
-        //ArrayAdapter using the string array and default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.months, android.R.layout.simple_spinner_dropdown_item);
-        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this, R.array.years, android.R.layout.simple_spinner_dropdown_item);
-        ArrayAdapter<CharSequence> adapter3 = ArrayAdapter.createFromResource(this, R.array.months, android.R.layout.simple_spinner_dropdown_item);
-        ArrayAdapter<CharSequence> adapter4 = ArrayAdapter.createFromResource(this, R.array.years, android.R.layout.simple_spinner_dropdown_item);
-        ArrayAdapter<CharSequence> adapter5 = ArrayAdapter.createFromResource(this, R.array.days, android.R.layout.simple_spinner_dropdown_item);
-        ArrayAdapter<CharSequence> adapter6 = ArrayAdapter.createFromResource(this, R.array.days, android.R.layout.simple_spinner_dropdown_item);
-
-        //Specifying the layout to use when the list of choice appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter4.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter5.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter6.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        //Applying adapter to the spinner
-        spinner1.setAdapter(adapter);
-        spinner2.setAdapter(adapter2);
-        spinner3.setAdapter(adapter3);
-        spinner4.setAdapter(adapter4);
-        spinner5.setAdapter(adapter5);
-        spinner6.setAdapter(adapter6);
-
-        //Setting up the onItemSelectedListeners
-        spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { //startMonthSpinner listener
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-                startMonthSpinner = spinner1.getSelectedItem().toString(); // Setting the value of the start month
-                createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner);
+        public DatePickerFragment(boolean x){
+            if(x){
+                isStartDate = true;
             }
+        }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
 
+        @Override
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            month += 1;
+            if(isStartDate){
+                startDate.setText(createStartDate(Integer.toString(day), Integer.toString(month), Integer.toString(year)));
             }
-        });
-
-        spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { //StartYearSpinner listener
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-
-                startYearSpinner = spinner2.getSelectedItem().toString(); // Setting the value of the start year
-                createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner);
+            else{
+                endDate.setText(createStartDate(Integer.toString(day), Integer.toString(month), Integer.toString(year)));
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-
-        spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { //endMonthSpinner listener
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-
-                endMonthSpinner = spinner3.getSelectedItem().toString(); // Setting the value of the end month
-                createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-
-        spinner4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { //endYearSpinner listener
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-
-                endYearSpinner = spinner4.getSelectedItem().toString(); // Setting the value of the end year
-                createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-
-        spinner5.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { //startDaySpinner listener
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-                startDaySpinner = spinner5.getSelectedItem().toString();
-                createStartDate(startDaySpinner, startMonthSpinner, startYearSpinner); // Setting the value of the start day
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-
-        spinner6.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() { //endDaySpinner listener
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-                endDaySpinner = spinner6.getSelectedItem().toString(); // Setting the value of the end day
-                createEndDate(endDaySpinner, endMonthSpinner, endYearSpinner);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-
-
-
+        }
     }
 
     /**
@@ -539,7 +390,6 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
         mMap = googleMap;
         googleMap.clear(); // Clearing the map allowing for a complete reset
-        LatLng eriePa = new LatLng(42.1292 , -80.0851); //Coordinates for Erie, Pa
         for (int x = 0; x < dateArray.size() ; x++) {   //Loop for creating all of the map markers
 
             double lat = latArray.get(x);
@@ -563,7 +413,6 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
             markerMap.put(x, storageReference.child(imageLinkArray.get(x)).getDownloadUrl());
 
-            int finalX = x;
             googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                 @Override
                 public void onInfoWindowClick(Marker marker) {
@@ -576,24 +425,30 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                 }
             });
 
-            //googleMap.addMarker(place); //Adding the marker To the map
-
         }
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(eriePa));    //Setting the starting point to Erie, Pa
+        LocationRequest locationRequest = new LocationRequest()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(2000)
+                .setFastestInterval(1000);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        Location location = locationResult.getLastLocation();
+                        startPoint = new LatLng(location.getLatitude(), location.getLongitude());
+                        if (!startPointSet){
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLng(startPoint));    //Setting the starting point to Erie, Pa
+                            startPointSet = true;
+                        }
+                    }
+                },Looper.myLooper());
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then
-            //How to overlay two images in Android to set an ImageView?www.tutorialspoint.com › how-to-overlay-two-images-i...
-            //Sep 11, 2019 — This example demonstrates how do I overlay two images In Android to set an ImageView.Step 1 − Create a new project in Android Studio, ...overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
     }

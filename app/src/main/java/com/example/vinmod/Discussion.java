@@ -266,7 +266,7 @@ public class Discussion extends AppCompatActivity {
             colorCounter++;
             if (colorCounter == 5) colorCounter = 0;
 
-            if(user.getUid().compareTo(post.getAuthorId()) == 0 || isModerator) {
+            if(user.getUid().compareTo(post.getAuthorId()) == 0 || (isModerator && post.getUserName().compareTo("vinmode2020") != 0)) {
                 deleteBtn.setText("  ×  ");
                 deleteBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
