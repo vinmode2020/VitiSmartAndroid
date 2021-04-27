@@ -5,11 +5,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,10 +51,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -71,6 +82,9 @@ public class Discussion extends AppCompatActivity {
     DatabaseReference dbRef = database.getReference("/posts");
     FirebaseUser user;
     FirebaseFirestore fStore;
+    DocumentReference documentReference;
+
+    Toast errorToast;
 
     Boolean isDescending = true;
     Boolean isModerator = false;
@@ -105,7 +119,7 @@ public class Discussion extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         fStore = FirebaseFirestore.getInstance();
-        DocumentReference documentReference = fStore.collection("users").document(user.getUid());
+        documentReference = fStore.collection("users").document(user.getUid());
 
         documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
             @Override
@@ -223,12 +237,55 @@ public class Discussion extends AppCompatActivity {
         }
     }
 
+    public void onBanUserClick(View v, String userName, String userUID){
+        AlertDialog.Builder banDialog = new AlertDialog.Builder(v.getContext());
+
+        banDialog.setTitle("Ban " + userName);
+
+        EditText reasonText = new EditText(Discussion.this);
+        banDialog.setMessage("Supply a reason for removing the post: ");
+        banDialog.setView(reasonText);
+
+        banDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(reasonText.getText().length() > 0){
+                    Map<String, Object> docData = new HashMap<>();
+                    docData.put("banned", "1");
+                    docData.put("bannedReason", reasonText.getText().toString());
+
+                    fStore.collection("users").document(userUID).set(docData, SetOptions.merge());
+
+                    Toast.makeText(Discussion.this, "User has been banned.", Toast.LENGTH_SHORT).show();
+
+                    finish();
+                    startActivity(getIntent());
+                }
+                else{
+                    errorToast = Toast.makeText(Discussion.this, "User not banned; you must supply a reason for the ban.", Toast.LENGTH_SHORT);
+                    View view = errorToast.getView();
+                    view.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                    errorToast.show();
+                }
+            }
+        });
+        banDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //close
+            }
+        });
+
+        banDialog.create().show();
+    }
+
     public class PostHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public final TextView postTitle;
         public final TextView postAuthor;
         public final TextView replyCount;
         public final TextView replyText;
         public final TextView deleteBtn;
+        public final ImageView banIcon;
         public final ConstraintLayout postListItem;
 
         public Post post;
@@ -240,6 +297,7 @@ public class Discussion extends AppCompatActivity {
             replyCount = itemView.findViewById(R.id.reply_count);
             replyText = itemView.findViewById(R.id.textView8);
             deleteBtn = itemView.findViewById(R.id.delete_post);
+            banIcon = itemView.findViewById(R.id.ban_icon);
             postListItem = itemView.findViewById(R.id.postListItem);
 
             postTitle.setOnClickListener(this);
@@ -250,6 +308,8 @@ public class Discussion extends AppCompatActivity {
 
         public void bind(Post currentPost){
             post = currentPost;
+            documentReference = fStore.collection("users").document(post.getAuthorId());
+
             postTitle.setText(post.getTitle());
             postTitle.setBackgroundColor(colors[colorCounter]);
 
@@ -263,8 +323,56 @@ public class Discussion extends AppCompatActivity {
 
             postListItem.setBackgroundTintList(ColorStateList.valueOf(colors[colorCounter]));
 
+            banIcon.setVisibility(View.INVISIBLE);
+
             colorCounter++;
             if (colorCounter == 5) colorCounter = 0;
+
+            documentReference.addSnapshotListener(Discussion.this, new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                    if(documentSnapshot.get("banned") != null){
+                        postAuthor.append(" ×");
+                        Spannable spannable = new SpannableString(postAuthor.getText().toString());
+                        spannable.setSpan(new ForegroundColorSpan(Color.DKGRAY), 3, postAuthor.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        StyleSpan bold = new StyleSpan(Typeface.BOLD);
+                        spannable.setSpan(bold, 3, postAuthor.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        postAuthor.setText(spannable, TextView.BufferType.SPANNABLE);
+                    }
+                    else if(documentSnapshot.get("AdminStatus") != null){
+                        postAuthor.append(" ♔");
+                        Spannable spannable = new SpannableString(postAuthor.getText().toString());
+                        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#8b0000")), 3, postAuthor.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        StyleSpan bold = new StyleSpan(Typeface.BOLD);
+                        spannable.setSpan(bold, 3, postAuthor.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        postAuthor.setText(spannable, TextView.BufferType.SPANNABLE);
+                    }
+                    else if(documentSnapshot.get("moderator") != null){
+                        postAuthor.append(" ★");
+                        Spannable spannable = new SpannableString(postAuthor.getText().toString());
+                        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#006400")), 3, postAuthor.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        StyleSpan bold = new StyleSpan(Typeface.BOLD);
+                        spannable.setSpan(bold, 3, postAuthor.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        postAuthor.setText(spannable, TextView.BufferType.SPANNABLE);
+                    }else {
+                        if(isModerator){
+                            banIcon.setVisibility(View.VISIBLE);
+                            postAuthor.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    onBanUserClick(v, post.getUserName(), post.getAuthorId());
+                                }
+                            });
+                            banIcon.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    onBanUserClick(v, post.getUserName(), post.getAuthorId());
+                                }
+                            });
+                        }
+                    }
+                }
+            });
 
             if(user.getUid().compareTo(post.getAuthorId()) == 0 || (isModerator && post.getUserName().compareTo("vinmode2020") != 0)) {
                 deleteBtn.setText("  ×  ");
@@ -304,7 +412,7 @@ public class Discussion extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int which) {
                                     if(reasonText.getText().length() > 0){
                                         if(isOnline()){
-                                            DocumentReference documentReference = fStore.collection("users").document(post.getAuthorId());
+                                            documentReference = fStore.collection("users").document(post.getAuthorId());
                                             documentReference.addSnapshotListener(Discussion.this, new EventListener<DocumentSnapshot>() {
                                                 @Override
                                                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -322,9 +430,15 @@ public class Discussion extends AppCompatActivity {
                                         else{
                                             Toast.makeText(Discussion.this, "Delete Message failed to send, make sure you have a reliable internet connection.", Toast.LENGTH_SHORT).show();
                                         }
+                                        finish();
+                                        startActivity(getIntent());
                                     }
-                                    finish();
-                                    startActivity(getIntent());
+                                    else{
+                                        errorToast = Toast.makeText(Discussion.this, "Post not removed; you must supply a reason for the removal.", Toast.LENGTH_SHORT);
+                                        View view = errorToast.getView();
+                                        view.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                                        errorToast.show();
+                                    }
                                 }
                             });
                             removePostDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

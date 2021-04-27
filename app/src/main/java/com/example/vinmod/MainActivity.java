@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser user;
     StorageReference storageReference;
 
+    boolean bannedFromDF = false;
+    String reasonForBan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,21 +95,21 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-
-
-
         DocumentReference documentReference = fStore.collection("users").document(userId);
         documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if(documentSnapshot != null){
                     fullName.setText(documentSnapshot.getString("fName"));
+                    if(documentSnapshot.get("banned") != null){
+                        bannedFromDF = true;
+                        reasonForBan = documentSnapshot.get("bannedReason").toString();
+                    }
                 }else {
                     Log.d("DOC_SNAPSHOT", "onEvent: Document does not exist");
                 }
             }
         });
-
 
         resetPassLocal.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,8 +162,6 @@ public class MainActivity extends AppCompatActivity {
         }
         });
 
-
-
         // Click the scan button
         button_scan.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -170,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
 
         // Click the scan button
         button_logout.setOnClickListener(new View.OnClickListener(){
@@ -196,9 +195,25 @@ public class MainActivity extends AppCompatActivity {
         button_dboard.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick (View v){
-                Intent intent = new Intent(MainActivity.this, Discussion.class);
-                //FirebaseAuth.getInstance().signOut();
-                startActivity(intent);
+                if(!bannedFromDF){
+                    Intent intent = new Intent(MainActivity.this, Discussion.class);
+                    //FirebaseAuth.getInstance().signOut();
+                    startActivity(intent);
+                }
+                else{
+                    AlertDialog.Builder banNotice = new AlertDialog.Builder(MainActivity.this);
+
+                    banNotice.setTitle("DF BAN NOTICE");
+                    banNotice.setMessage("You have been banned from the app discussion forum for the following reason:\n\n" + reasonForBan + "\n\nThis means you may no longer view or post in the VitiSmart discussion forum." +
+                            " If you believe this was done in error, please let us know at vinmode2020@gmail.com or use the \"Contact Us\" option on the home page.");
+                    banNotice.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //close
+                        }
+                    });
+                    banNotice.create().show();
+                }
             }
         });
 
