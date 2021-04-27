@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -57,6 +58,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -79,10 +81,12 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
     FirebaseFirestore fStore;
     Button confirmDateBtn;
     static Button startDate, endDate;
+    TextView morePinInfo;
 
     LatLng startPoint;
     boolean startPointSet = false;
 
+    SupportMapFragment mapFragment;
 
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -115,9 +119,12 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_map);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         confirmDateBtn = findViewById(R.id.heatMapConfirmDateButton); //Linking confirmDateBtn to respective Button in heat map page
         startDate = findViewById(R.id.pick_startdate);
         endDate = findViewById(R.id.pick_enddate);
+
+        morePinInfo = findViewById(R.id.morePinInfo);
 
         fStore = FirebaseFirestore.getInstance();
 
@@ -154,6 +161,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
         });
 
         checkPermission(); //Checking permissions
+
         confirmDateBtnListener(); //For Querying the The database
 
         startDate.setOnClickListener(new View.OnClickListener() {
@@ -171,6 +179,8 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
             }
         });
     }
+
+
 
 
     /**
@@ -293,7 +303,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 }
                 onMapReady(mMap); //Adding users pins to the map
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(startPoint));    //Setting the starting point to Erie, Pa
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(startPoint));
             }
             //-----Delete when finished-----//
             for (int x = 0; x <infestedArray.size();x++){
@@ -344,14 +354,14 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
      * Checking permissions
      */
     private void checkPermission() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_READ_CONTACTS);
         } else {
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
+            Log.d("MAPCHECK", "In here...");
         }
 
     }
@@ -360,7 +370,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
      * Requesting permissions
      * @param requestCode our code for the permission
      * @param permissions asking for specific permission
-     * @param grantResults result of the permmissions
+     * @param grantResults result of the permissions
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -368,11 +378,18 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
             case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
                     mapFragment.getMapAsync(this);
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
+                    Log.d("MAPCHECK", "Permission denied :(");
+                    mapFragment.getView().setVisibility(View.INVISIBLE);
+                    confirmDateBtn.setClickable(false);
+                    startDate.setClickable(false);
+                    startDate.setText("");
+                    endDate.setClickable(false);
+                    endDate.setText("");
+                    morePinInfo.setText("Enable location permissions to use the map.");
                 }
                 return;
             }
@@ -432,12 +449,10 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                 .setInterval(2000)
                 .setFastestInterval(1000);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
+                        Log.d("MAPCHECK", "Updating location...");
                         Location location = locationResult.getLastLocation();
                         startPoint = new LatLng(location.getLatitude(), location.getLongitude());
                         if (!startPointSet){
@@ -447,10 +462,6 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 },Looper.myLooper());
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
     }
 
 }

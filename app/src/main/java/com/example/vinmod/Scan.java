@@ -12,9 +12,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.ImageDecoder;
+import android.graphics.PorterDuff;
 import android.hardware.Camera;
 import android.location.Location;
 import android.location.LocationManager;
@@ -101,6 +105,8 @@ public class Scan extends AppCompatActivity {
     String imageLon;
     String imageStatus;
 
+    Toast errorToast;
+
     boolean uploadImageInListener = false;
 
     @Override
@@ -122,8 +128,8 @@ public class Scan extends AppCompatActivity {
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        askCameraPermissions();
         askStoragePermissions();
+        askCameraPermissions();
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -131,6 +137,7 @@ public class Scan extends AppCompatActivity {
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                askLocationPermissions();
                 currentCode = CAMERA_REQUEST_CODE;
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.Images.Media.TITLE, "New Picture");
@@ -139,13 +146,13 @@ public class Scan extends AppCompatActivity {
                 Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
                 startActivityForResult(captureIntent, CAMERA_REQUEST_CODE);
-                askLocationPermissions();
             }
         });
 
         galleryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                askLocationPermissions();
                 currentCode = GALLERY_REQUEST_CODE;
                 Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(gallery, GALLERY_REQUEST_CODE);
@@ -158,6 +165,14 @@ public class Scan extends AppCompatActivity {
                 infBtn.setEnabled(false);
                 notInfBtn.setEnabled(false);
                 notSureBtn.setEnabled(false);
+                if (ContextCompat.checkSelfPermission(Scan.this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    errorToast = Toast.makeText(Scan.this, "Picture not uploaded; GPS permissions not granted!", Toast.LENGTH_SHORT);
+                    View view = errorToast.getView();
+                    view.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                    errorToast.show();
+                    onBackPressed();
+                }
                 progressBar.setVisibility(View.VISIBLE);
                 String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                 if (currentCode == CAMERA_REQUEST_CODE) {
@@ -169,7 +184,10 @@ public class Scan extends AppCompatActivity {
                         uploadImageToFirebase(galleryFileName, contentUri, false);
                     }
                     else{
-                        Toast.makeText(Scan.this, "ERROR: No image selected.", Toast.LENGTH_SHORT).show();
+                        errorToast = Toast.makeText(Scan.this, "ERROR: No image selected.", Toast.LENGTH_SHORT);
+                        View view = errorToast.getView();
+                        view.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                        errorToast.show();
                         onBackPressed();
                     }
                 }
@@ -183,6 +201,14 @@ public class Scan extends AppCompatActivity {
                 infBtn.setEnabled(false);
                 notInfBtn.setEnabled(false);
                 notSureBtn.setEnabled(false);
+                if (ContextCompat.checkSelfPermission(Scan.this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    errorToast = Toast.makeText(Scan.this, "Picture not uploaded; GPS permissions denied!", Toast.LENGTH_SHORT);
+                    View view = errorToast.getView();
+                    view.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                    errorToast.show();
+                    onBackPressed();
+                }
                 progressBar.setVisibility(View.VISIBLE);
                 String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                 Log.d("RESULT", Integer.toString(currentCode));
@@ -195,7 +221,10 @@ public class Scan extends AppCompatActivity {
                         uploadImageToFirebase(galleryFileName, contentUri, false);
                     }
                     else{
-                        Toast.makeText(Scan.this, "ERROR: No image selected.", Toast.LENGTH_SHORT).show();
+                        errorToast = Toast.makeText(Scan.this, "ERROR: No image selected.", Toast.LENGTH_SHORT);
+                        View view = errorToast.getView();
+                        view.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                        errorToast.show();
                         onBackPressed();
                     }
                 }
@@ -247,15 +276,28 @@ public class Scan extends AppCompatActivity {
     }
 
 
-    // If the user granted the permission open the camera,
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d("PERMISSIONCHECK", "Why are we already here");
         if (requestCode == CAMERA_PERM_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 recreate();
             } else {
                 // If the user deny the request to use the camera
-                Toast.makeText(this, "Camera Permission is Required to Use camera.", Toast.LENGTH_SHORT).show();
+                cameraBtn.setClickable(false);
+                cameraBtn.setBackgroundTintList(ColorStateList.valueOf(Color.DKGRAY));
+                beforeImage.setText("Camera permissions are required to use the \"capture\" option.");
+            }
+        }
+        if (requestCode == STORAGE_PER_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                recreate();
+            } else {
+                cameraBtn.setClickable(false);
+                cameraBtn.setBackgroundTintList(ColorStateList.valueOf(Color.DKGRAY));
+                galleryBtn.setClickable(false);
+                galleryBtn.setBackgroundTintList(ColorStateList.valueOf(Color.DKGRAY));
+                beforeImage.setText("Storage permissions required!");
             }
         }
     }
@@ -407,16 +449,20 @@ public class Scan extends AppCompatActivity {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 if(imageLat == null || imageLon == null){
-                    Toast.makeText(Scan.this, "Picture not uploaded, error fetching GPS coordinates.", Toast.LENGTH_SHORT).show();
+                    errorToast = Toast.makeText(Scan.this, "Picture not uploaded, error fetching GPS coordinates.", Toast.LENGTH_SHORT);
+                    View view = errorToast.getView();
+                    view.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                    errorToast.show();
                     image.delete();
                     onBackPressed();
-                    return;
                 }
                 else if (imageLat.compareTo("0.0") == 0 && imageLon.compareTo("0.0") == 0){
-                    Toast.makeText(Scan.this, "Picture not uploaded, image has no GPS coordinates.", Toast.LENGTH_SHORT).show();
+                    errorToast = Toast.makeText(Scan.this, "Picture not uploaded, image has no GPS coordinates.", Toast.LENGTH_SHORT);
+                    View view = errorToast.getView();
+                    view.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                    errorToast.show();
                     image.delete();
                     onBackPressed();
-                    return;
                 }
 
                 final boolean[] uploadFinished = {false};
