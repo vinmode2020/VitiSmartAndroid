@@ -356,7 +356,7 @@ public class ViewPost extends AppCompatActivity implements Serializable {
             colorCounter++;
             if (colorCounter == 5) colorCounter = 0;
 
-            //If the replies has its own replies, include element of reply header that discloses number of replies
+            //If the reply has its own replies, include element of reply header that discloses number of replies
             if (Integer.parseInt(reply.getReplyCount()) > 0){
                 Log.d("REPLY", "In here...");
 
