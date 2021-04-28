@@ -49,6 +49,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.SetOptions;
@@ -279,6 +280,38 @@ public class Discussion extends AppCompatActivity {
         banDialog.create().show();
     }
 
+    public void onUnbanUserClick(View v, String userName, String userID){
+        AlertDialog.Builder unbanDialog = new AlertDialog.Builder(v.getContext());
+
+        unbanDialog.setTitle("Ban " + userName);
+        unbanDialog.setMessage("Are you sure you want to unban " + userName + "?");
+
+        unbanDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Map<String, Object> docData = new HashMap<>();
+                docData.put("banned", FieldValue.delete());
+                docData.put("bannedReason", FieldValue.delete());
+
+                documentReference = fStore.collection("users").document(userID);
+                documentReference.update(docData);
+
+                Toast.makeText(Discussion.this, "User has been unbanned.", Toast.LENGTH_SHORT).show();
+
+                finish();
+                startActivity(getIntent());
+            }
+        });
+        unbanDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        unbanDialog.create().show();
+    }
+
     public class PostHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public final TextView postTitle;
         public final TextView postAuthor;
@@ -338,6 +371,14 @@ public class Discussion extends AppCompatActivity {
                         StyleSpan bold = new StyleSpan(Typeface.BOLD);
                         spannable.setSpan(bold, 3, postAuthor.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         postAuthor.setText(spannable, TextView.BufferType.SPANNABLE);
+                        if(isModerator){
+                            postAuthor.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    onUnbanUserClick(v, post.getUserName(), post.getAuthorId());
+                                }
+                            });
+                        }
                     }
                     else if(documentSnapshot.get("AdminStatus") != null){
                         postAuthor.append(" ♔");

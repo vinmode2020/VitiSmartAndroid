@@ -82,7 +82,6 @@ public class Scan extends AppCompatActivity {
     public int currentCode;
     String galleryFileName;
 
-
     DatabaseReference databaseReference;
     LocationManager locationManager;
     ImageView selectedImage;
