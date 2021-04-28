@@ -10,11 +10,9 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
@@ -63,14 +61,11 @@ import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 /**
  * This class handles the Discussion Forum Home Page Activity.
@@ -108,12 +103,11 @@ public class Discussion extends AppCompatActivity {
 
     //Array of colors used to give post headers their varying background colors
     int colorCounter = 0;
-    int colors[] = {Color.argb(255, 86, 180, 233),
+    int[] colors = {Color.argb(255, 86, 180, 233),
             Color.argb(255, 230, 159, 0),
             Color.argb(255, 0, 158, 115),
             Color.argb(255, 240, 228, 66),
             Color.argb(255, 204, 121, 167)};
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -125,7 +119,7 @@ public class Discussion extends AppCompatActivity {
         searchButton = findViewById(R.id.search_btn);
         postList = findViewById(R.id.post_list);
 
-        //Add spacing between post headers in list
+        //Add spacing between post headers in RecyclerView
         int spacing = getResources().getDimensionPixelSize(R.dimen.nav_header_vertical_spacing);
         postList.addItemDecoration(new SpacesItemDecoration(spacing));
 
@@ -351,7 +345,7 @@ public class Discussion extends AppCompatActivity {
      * ViewHolder class for postList RecyclerView
      *
      * This class uses the list_item_post.xml layout file to generate post headers for each post
-     * pulled from the discussion forum.
+     * pulled from the database.
      */
     public class PostHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public final TextView postTitle;
@@ -402,7 +396,7 @@ public class Discussion extends AppCompatActivity {
             //By default, cannot see ban option
             banIcon.setVisibility(View.INVISIBLE);
 
-            //Iterate through color list
+            //Iterate to next color in color list
             colorCounter++;
             if (colorCounter == 5) colorCounter = 0;
 

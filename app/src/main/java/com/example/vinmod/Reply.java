@@ -1,5 +1,8 @@
 package com.example.vinmod;
 
+/**
+ * Data class for holding discussion post replies gathered from the Firebase database.
+ */
 public class Reply {
     private String id;
     private String date;

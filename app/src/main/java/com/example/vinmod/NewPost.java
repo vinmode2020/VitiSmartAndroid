@@ -1,6 +1,5 @@
 package com.example.vinmod;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,22 +17,28 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * AppCompatActivity class that handles the Discussion Forum New Post Activity.
+ * It is linked to the activity_new_post.xml layout file.
+ */
 public class NewPost extends AppCompatActivity {
 
-    private DatabaseReference databaseReference;
-    private FirebaseUser user;
+    //Firebase reference variables
+    private DatabaseReference databaseReference;    //Database reference
+    private FirebaseUser user;  //Info on currently logged in user
 
-    Button publishBtn;
-    Button cancelButton;
-
-    EditText postTitle;
-    EditText postContent;
+    //Variables for layout elements
+    Button publishBtn;  //Button for publishing post
+    Button cancelButton;    //Button for canceling publishing
+    EditText postTitle; //ExitText for inputting title of post
+    EditText postContent;   //EditText for inputting body of post
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_post);
 
+        //Initialize layout variables
         publishBtn = findViewById(R.id.publish_Btn);
         cancelButton = findViewById(R.id.cancel_btn);
         postTitle = findViewById(R.id.edit_title);
@@ -44,18 +49,20 @@ public class NewPost extends AppCompatActivity {
         publishBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //Publish post only if both title and body are supplied
                 if(!postTitle.getText().toString().isEmpty() && !postContent.getText().toString().isEmpty()){
+                    //Get displayable and sortable timestamp
                     SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy 'at' hh:mm:ss");
                     SimpleDateFormat dateSortable = new SimpleDateFormat("yyyyMMddHHmmss");
-
                     String formatDate = date.format(new Date());
                     String formatDateSortable = dateSortable.format(new Date());
 
+                    //Get info on currently logged in user
                     user = FirebaseAuth.getInstance().getCurrentUser();
-
+                    //Get user e-mail without "@--.com"
                     String screenName = user.getEmail().substring(0, user.getEmail().indexOf('@'));
 
+                    //Create new post data object for the post to be added to database
                     Post newPost = new Post(
                             UUID.randomUUID().toString().replace("-", ""),
                             formatDate, postTitle.getText().toString(),
@@ -63,8 +70,10 @@ public class NewPost extends AppCompatActivity {
                             screenName, 0, user.getUid()
                     );
 
+                    //Get database reference
                     databaseReference = FirebaseDatabase.getInstance().getReference();
 
+                    //Add post to database at path "posts"
                     databaseReference.child("posts").child(newPost.getId());
                     databaseReference.child("posts").child(newPost.getId()).child("authorId").setValue(newPost.getAuthorId());
                     databaseReference.child("posts").child(newPost.getId()).child("author").setValue(newPost.getUserName());
@@ -88,6 +97,7 @@ public class NewPost extends AppCompatActivity {
             }
         });
 
+        //If cancelled, return to forum home
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View V){

@@ -1,5 +1,8 @@
 package com.example.vinmod;
 
+/**
+ * Data class for holding Discussion Posts gathered from the Firebase database.
+ */
 public class Post {
     private String id;
     private String authorId;
