@@ -7,21 +7,15 @@ import com.google.android.material.tabs.TabLayout;
 
 
 /**
- * This method creates the functionality behind the Resource Button on the VINMOD homepage
- *
- * @author David Simmons, Mohamed Ibrahim
+ * AppCompatActivity class that handles the Resource Page Activity.
+ * It is linked to the activity_resource.xml layout file.
  */
 public class Resource extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
+    //Declare layout elements
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
-
-    /**
-     * This method sets all the functionality behind the activity_resource.xml file.
-     *
-     * @param savedInstanceState Instance of the activity_resource.xml when created
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState){
 
@@ -34,6 +28,7 @@ public class Resource extends AppCompatActivity implements TabLayout.OnTabSelect
         tabLayout = findViewById(R.id.tabLayout);
 
 
+        //Create tabs with enum(1-10) titles
         tabLayout.addTab(tabLayout.newTab().setText("1"));
         tabLayout.addTab(tabLayout.newTab().setText("2"));
         tabLayout.addTab(tabLayout.newTab().setText("3"));

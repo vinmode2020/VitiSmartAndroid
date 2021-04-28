@@ -69,9 +69,8 @@ import java.util.List;
 //https://console.cloud.google.com/apis/credentials?authuser=1&project=vinmod&supportedpurview=project
 
 /**
- * This Class creates the Map fragment for use in our Application
- *
- * @author David Simmons, Mohammed Ibrahim
+ * AppCompatActivity class that handles the Infestation Map Activity.
+ * It is linked to the activity_map.xml layout file.
  */
 public class Map extends AppCompatActivity implements OnMapReadyCallback {
 

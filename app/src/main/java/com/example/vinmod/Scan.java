@@ -16,23 +16,17 @@ import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.ImageDecoder;
 import android.graphics.PorterDuff;
-import android.hardware.Camera;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -43,7 +37,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -60,52 +53,61 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
 
-import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
-
+/**
+ * AppCompatActivity class that handles the Cluster Capture Activity.
+ * It is linked to the activity_view_post.xml layout file.
+ */
 public class Scan extends AppCompatActivity {
+
+    //Permission request codes; used in checking for and requesting of app permissions
     public static final int CAMERA_PERM_CODE = 101;
     public static final int CAMERA_REQUEST_CODE = 102;
     public static final int GALLERY_REQUEST_CODE = 105;
     public static final int STORAGE_PER_CODE = 103;
     public static final int LOCATION_PER_CODE = 106;
     public static final int MEDIA_LOCATION_CODE = 107;
-    public int currentCode;
+    public int currentCode; //Stores CAMERA_REQUEST_CODE if taking picture, GALLERY_REQUEST_CODE if uploading
     String galleryFileName;
 
-    DatabaseReference databaseReference;
-    LocationManager locationManager;
-    ImageView selectedImage;
-    Button cameraBtn, galleryBtn;
-    StorageReference storageReference;
-    Button infBtn, notSureBtn;
-    Button notInfBtn;
-    ProgressBar progressBar;
-    TextView stepCounter;
-    TextView stepDescription;
-    TextView beforeImage;
-    Uri contentUri;
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    //Firebase contect references
+    DatabaseReference databaseReference;    //Reference to Realtime Database
+    StorageReference storageReference;  //Reference to Firebase Cloud Storage
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();    //Info on currently logged in user
 
+    //Used to request LatLng coordinates from device GPS
+    LocationManager locationManager;
     FusedLocationProviderClient fusedLocationProviderClient;
 
+    //Layout elements
+    ImageView selectedImage;    //Displays image preview after it is uploaded/taken
+    Button cameraBtn;   //Used to take picture in-app
+    Button galleryBtn;  //Used to upload image from photo gallery
+    Button infBtn;  //Used to mark an image as infested
+    Button notSureBtn;  //Used to mark an image as not infested
+    Button notInfBtn;   //Used to navigate to resource page
+    ProgressBar progressBar;    //Displays while app is uploading image
+    TextView stepCounter;   //Displays what step of the process the user is currently on ("Step 1" or "Step 2")
+    TextView stepDescription;   //Displays what needs to be done in the current step
+    TextView beforeImage;   //Gray box that appears before an image is uploaded/taken
+
+    //Stores path to image to be uploaded
+    Uri contentUri;
+
+    //Variables for globally storing image metadata
     String imageDate;
     String imageTime;
     String imageLat;
     String imageLon;
     String imageStatus;
 
+    //Displays error messages
     Toast errorToast;
 
+    //Controls whether or not to upload an image during an iteration of the location listener
     boolean uploadImageInListener = false;
 
     @Override
