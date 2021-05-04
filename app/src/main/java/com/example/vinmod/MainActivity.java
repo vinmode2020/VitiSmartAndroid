@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         fullName = findViewById(R.id.profileName);
         resetPassLocal = findViewById(R.id.resetPasswordLocal);
         button_rpage = findViewById(R.id.button_rpage);
+        // To take the picture
         button_scan = findViewById(R.id.button_scan);
         button_logout = findViewById(R.id.button_logout);
         button_map = findViewById(R.id.button_map);
@@ -147,9 +148,7 @@ public class MainActivity extends AppCompatActivity {
                         // close
                     }
                 });
-
                 passwordResetDialog.create().show();
-
             }
         });
 
@@ -202,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     AlertDialog.Builder banNotice = new AlertDialog.Builder(MainActivity.this);
-
+                    // The email is used in this message is vinmode2020@gmail.com this should be changed if the admin email is changed.
                     banNotice.setTitle("DF BAN NOTICE");
                     banNotice.setMessage("You have been banned from the app discussion forum for the following reason:\n\n" + reasonForBan + "\n\nThis means you may no longer view or post in the VitiSmart discussion forum." +
                             " If you believe this was done in error, please let us know at vinmode2020@gmail.com or use the \"Contact Us\" option on the home page.");

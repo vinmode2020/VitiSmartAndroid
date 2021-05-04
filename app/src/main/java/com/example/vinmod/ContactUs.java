@@ -20,11 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.io.File;
 import java.util.Properties;
 
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -66,9 +63,11 @@ public class ContactUs extends AppCompatActivity {
             public void onClick (View v){
                 String etSubjectText = etSubject.getText().toString();
                 String etMessageText = etMessage.getText().toString();
+                // To ensure the subject is not empty
                 if(etSubjectText.isEmpty()){
                     etSubject.setError("Field cannot be blank");
                 }
+                // To ensure the body is not empty
                 if(etMessageText.isEmpty()){
                     etMessage.setError("Field cannot be blank");
                 }
@@ -84,12 +83,14 @@ public class ContactUs extends AppCompatActivity {
                             btSend.setEnabled(true);
                             Toast.makeText(ContactUs.this, "SMTP Authentication Failed. navigating to email app...", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(Intent.ACTION_SENDTO); // it's not ACTION_SEND
+                            // This is the receiver's email
                             intent.setData(Uri.parse("mailto:vinmode2020@gmail.com"));
                             intent.putExtra(Intent.EXTRA_SUBJECT, etSubjectText);
                             intent.putExtra(Intent.EXTRA_TEXT, etMessageText);
                             try {
                                 // startActivity(intent);
                                 startActivity(Intent.createChooser(intent, "Send email using..."));
+                            // IF the android device has no email client installed
                             } catch (android.content.ActivityNotFoundException ex) {
                                 Toast.makeText(ContactUs.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                             }

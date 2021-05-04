@@ -51,22 +51,25 @@ public class Login extends AppCompatActivity {
                 String email = mEmail.getText().toString().trim();
                 String password = mPassword.getText().toString().trim();
 
+                // If the email left blank
                 if(TextUtils.isEmpty(email)){
                     mEmail.setError("Email is Required.");
                     return;
                 }
-
+                // If the password left blank.
                 if(TextUtils.isEmpty(password)){
                     mPassword.setError("Password is Required.");
                     return;
                 }
 
+                // To check the password length
                 if(password.length() < 6){
                     mPassword.setError("Password Must be >= 6 Characters");
                     return;
                 }
 
-              //   progressBar.setVisibility(View.VISIBLE);
+                //Progress bar can be added.
+                //progressBar.setVisibility(View.VISIBLE);
 
                 // authenticate the user
                 fAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {

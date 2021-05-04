@@ -215,6 +215,7 @@ public class Scan extends AppCompatActivity {
                 Log.d("RESULT", Integer.toString(currentCode));
                 if (currentCode == CAMERA_REQUEST_CODE) {
                     imageStatus = "false";
+                    // Naming and uploading the image
                     uploadImageToFirebase("IMG_"+ timeStamp + ".jpg", contentUri, true);
                 } else if (currentCode == GALLERY_REQUEST_CODE) {
                     imageStatus = "false";
