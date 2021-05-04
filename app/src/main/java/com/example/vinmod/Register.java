@@ -26,13 +26,28 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * AppCompatActivity class that handles the Account Registration Activity.
+ * It is linked to the activity_map.xml layout file.
+ */
 public class Register extends AppCompatActivity {
     public static final String TAG = "TAG";
-    EditText mFullName,mEmail,mPassword,mPhone, ConfPassword;
-    Button mRegisterBtn, mLoginBtn;
-    FirebaseAuth fAuth;
-    ProgressBar progressBar;
-    FirebaseFirestore fStore;
+
+    //Variables for layout elements
+    EditText mFullName; //For inputting full name
+    EditText mEmail;    //For inputting email address
+    EditText mPassword; //For inputting password
+    EditText mPhone;    //For inputting phone number
+    EditText confPassword;  //For confirming password
+    Button mRegisterBtn;    //Executes account registration
+    Button mLoginBtn;   //Navigates to Login Activity
+    ProgressBar progressBar;    //Displays while account is being created
+
+    //Firebase reference
+    FirebaseAuth fAuth; //Authentication reference
+    FirebaseFirestore fStore;   //Cloud Firestore reference
+
+    //Stores user UID
     String userID;
 
     @Override
@@ -40,58 +55,61 @@ public class Register extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        //Initialize layout elements
         mFullName   = findViewById(R.id.fullName);
         mEmail      = findViewById(R.id.Email);
         mPassword   = findViewById(R.id.password);
-        ConfPassword = findViewById(R.id.ConfPassword);
+        confPassword = findViewById(R.id.ConfPassword);
         mPhone      = findViewById(R.id.phone);
         mRegisterBtn= findViewById(R.id.registerBtn);
         mLoginBtn   = findViewById(R.id.createText);
-
-        fAuth = FirebaseAuth.getInstance();
-        fStore = FirebaseFirestore.getInstance();
         progressBar = findViewById(R.id.progressBar);
 
+        //Initialize Firebase references
+        fAuth = FirebaseAuth.getInstance();
+        fStore = FirebaseFirestore.getInstance();
+
+        //If a user has already logged in, just navigate to home page
         if(fAuth.getCurrentUser() != null){
             startActivity(new Intent(getApplicationContext(),MainActivity.class));
             finish();
         }
 
-
+        //Click listener for "Create New Account" button
         mRegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String email = mEmail.getText().toString().trim();
+                //Store user-input data from EditTexts
+                String email = mEmail.getText().toString().trim();
                 String password = mPassword.getText().toString().trim();
-                String con_password = ConfPassword.getText().toString().trim();
-                final String fullName = mFullName.getText().toString();
-                final String phone    = mPhone.getText().toString();
+                String con_password = confPassword.getText().toString().trim();
+                String fullName = mFullName.getText().toString();
+                String phone    = mPhone.getText().toString();
 
+                //Various checks for validity of supplied information. If any conditions are not
+                //met, prevent account creation
                 if(TextUtils.isEmpty(email)){
                     mFullName.setError("Name is required");
                     return;
                 }
-
                 if(TextUtils.isEmpty(email)){
                     mEmail.setError("Email is Required.");
                     return;
                 }
-
                 if(TextUtils.isEmpty(password)){
                     mPassword.setError("Password is Required.");
                     return;
                 }
-
                 if(password.length() < 6){
                     mPassword.setError("Password Must be >= 6 Characters");
                     return;
                 }
-
                 if(!(password.equals(con_password))){
                     mPassword.setError("Passwords do not match");
                     return;
                 }
 
+                //Display while account creation executes
                 progressBar.setVisibility(View.VISIBLE);
 
                 // register the user in firebase
@@ -99,7 +117,6 @@ public class Register extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-
                             // send verification link
                             FirebaseUser fuser = fAuth.getCurrentUser();
                             fuser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -116,6 +133,9 @@ public class Register extends AppCompatActivity {
 
                             Toast.makeText(Register.this, "User Created.", Toast.LENGTH_SHORT).show();
                             userID = fAuth.getCurrentUser().getUid();
+
+                            //Create new document in Cloud Firestore for the new user profile and add their name,
+                            //e-mail, and phone number as attributes
                             DocumentReference documentReference = fStore.collection("users").document(userID);
                             Map<String,Object> user = new HashMap<>();
                             user.put("fName",fullName);
@@ -132,6 +152,7 @@ public class Register extends AppCompatActivity {
                                     Log.d(TAG, "onFailure: " + e.toString());
                                 }
                             });
+                            //Go to home page
                             startActivity(new Intent(getApplicationContext(),MainActivity.class));
 
                         }else {
