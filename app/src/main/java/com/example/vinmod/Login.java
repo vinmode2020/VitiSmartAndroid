@@ -88,18 +88,8 @@ public class Login extends AppCompatActivity {
 
             }
         });
-/*
 
-      //  if the user click create a new account
-  mCreateBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),Register.class));
-            }
-        });
-
- */
-        // If user click on "Forget you password"
+        // If user clicks on "Forgot your password"
         forgotTextLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

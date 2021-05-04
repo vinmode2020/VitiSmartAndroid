@@ -53,42 +53,4 @@ public class DiscussionHomeTests{
         intended(hasComponent(ViewPost.class.getName()));
     }
 
-    @Test
-    public void sortByNewTest(){
-        onView(withId(R.id.sort_options)).perform(ViewActions.click());
-        onView(allOf(withId(text1), withText("Date(newest)"))).perform(ViewActions.click());
-        Discussion discussionSnapshot = activityRule.getActivity();
-        String firstPostDate = discussionSnapshot.discussionPosts.get(0).getDate();
-        firstPostDate = firstPostDate.substring(6, 10) + firstPostDate.substring(3, 5) + firstPostDate.substring(0, 2) + firstPostDate.substring(14).replace(":", "");
-        String lastPostDate = discussionSnapshot.discussionPosts.get(0).getDate();
-        lastPostDate = lastPostDate.substring(6, 10) + lastPostDate.substring(3, 5) + lastPostDate.substring(0, 2) + lastPostDate.substring(14).replace(":", "");
-        int firstPostDateValue = Integer.parseInt(firstPostDate);
-        int lastPostDateValue = Integer.parseInt(lastPostDate);
-        Assert.assertTrue(firstPostDateValue > lastPostDateValue);
-    }
-
-    @Test
-    public void sortByOldTest(){
-        onView(withId(R.id.sort_options)).perform(ViewActions.click());
-        onView(allOf(withId(text1), withText("Date(oldest)"))).perform(ViewActions.click());
-        Discussion discussionSnapshot = activityRule.getActivity();
-        String firstPostDate = discussionSnapshot.discussionPosts.get(0).getDate();
-        firstPostDate = firstPostDate.substring(6, 10) + firstPostDate.substring(3, 5) + firstPostDate.substring(0, 2) + firstPostDate.substring(14).replace(":", "");
-        String lastPostDate = discussionSnapshot.discussionPosts.get(0).getDate();
-        lastPostDate = lastPostDate.substring(6, 10) + lastPostDate.substring(3, 5) + lastPostDate.substring(0, 2) + lastPostDate.substring(14).replace(":", "");
-        int firstPostDateValue = Integer.parseInt(firstPostDate);
-        int lastPostDateValue = Integer.parseInt(lastPostDate);
-        Assert.assertTrue(firstPostDateValue < lastPostDateValue);
-    }
-
-    @Test
-    public void sortByPopTest(){
-        onView(withId(R.id.sort_options)).perform(ViewActions.click());
-        onView(allOf(withId(text1), withText("Most Popular"))).perform(ViewActions.click());
-        Discussion discussionSnapshot = activityRule.getActivity();
-        String firstPostReplies = discussionSnapshot.discussionPosts.get(0).getReplyCount();
-        String lastPostReplies = discussionSnapshot.discussionPosts.get(0).getReplyCount();
-        Assert.assertTrue(firstPostReplies > lastPostReplies);
-    }
-
 }

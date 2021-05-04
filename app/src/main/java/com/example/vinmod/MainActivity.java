@@ -29,7 +29,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int GALLERY_INTENT_CODE = 1023 ;
     TextView fullName,verifyMsg;
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
